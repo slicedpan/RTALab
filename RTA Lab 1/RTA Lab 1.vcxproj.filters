@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\glm">
+      <UniqueIdentifier>{d9cbbd2b-36e5-48ff-b315-5ee0d4627c30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\glm">
+      <UniqueIdentifier>{39a468d5-75b7-4db7-a4c7-b3417510520f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="glm\glm.h">
+      <Filter>Header Files\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="glm\glmint.h">
+      <Filter>Header Files\glm</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RTA Lab 1.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glm\glm.c">
+      <Filter>Source Files\glm</Filter>
+    </ClCompile>
+    <ClCompile Include="glm\glm_util.c">
+      <Filter>Source Files\glm</Filter>
+    </ClCompile>
+    <ClCompile Include="glm\glmimg.c">
+      <Filter>Source Files\glm</Filter>
+    </ClCompile>
+    <ClCompile Include="glm\glmimg_devil.c">
+      <Filter>Source Files\glm</Filter>
+    </ClCompile>
+    <ClCompile Include="glm\glmimg_jpg.c">
+      <Filter>Source Files\glm</Filter>
+    </ClCompile>
+    <ClCompile Include="glm\glmimg_png.c">
+      <Filter>Source Files\glm</Filter>
+    </ClCompile>
+    <ClCompile Include="glm\glmimg_sdl.c">
+      <Filter>Source Files\glm</Filter>
+    </ClCompile>
+    <ClCompile Include="glm\glmimg_sim.c">
+      <Filter>Source Files\glm</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
