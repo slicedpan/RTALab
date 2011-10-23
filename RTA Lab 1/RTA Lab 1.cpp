@@ -8,6 +8,7 @@
 #include "glm/glm.h"
 #include "svl/SVL.h"
 #include "svl/SVLgl.h"
+#include "Bezier.h"
 
 void setupScene();
 void updateScene();
@@ -38,10 +39,7 @@ Vec3 p2(0.0, 1.5, 5.0);
 Vec3 p3(5.0, 1.5, 10.0);
 Vec3 p4(2.5, 1.5, 15.0);
 
-Vec3 bezierPosition(float t)
-{
-	return t * ((t * (t * p1 + (1.0f- t) * p2)) + (1.0f - t) * (t * p2 + (1.0f - t) * p3)) + (1.0f - t) * (t * (t * p2 + (1.0f - t) * p3) + (1.0f - t) * (t * p3 + (1.0f - t) * p4));
-}
+Bezier curve(p1, p2, p3, p4);
 
 struct _position
 {
@@ -109,10 +107,10 @@ void renderSpider()
 
 	//spider
 	glPushMatrix();
-	Vec3 p = bezierPosition(t);
+	Vec3 p = curve.Position(t);
 	glTranslatef(p[0], p[1], p[2]);
 
-	Vec3 nextP = bezierPosition(t + 0.01f);
+	Vec3 nextP = curve.Position(t + 0.01f);
 	float spiderYaw = atan2f(nextP[0] - p[0], nextP[2] - p[2]);
 	glRotatef(spiderYaw * (180.0f / M_PI), 0.0f, 1.0f, 0.0f); 
 	//legs
@@ -192,23 +190,6 @@ void renderLeg(float orientation, float* position, float timeOffset)
 	glPopMatrix();
 }
 
-void drawSpline()
-{
-	float t = 0.01f;
-	glBegin(GL_LINES);
-	Vec3 lastPos = bezierPosition(0.0f);
-	glColor4f(1.0, 0.0, 0.0, 1.0);
-	while (t < 1.0f)
-	{
-
-		glVertex(lastPos);
-		lastPos = bezierPosition(t);
-		glVertex(lastPos);
-		t += 0.01f;
-	}
-	glEnd();
-}
-
 void renderScene(){
         
     // Clear framebuffer & depth buffer
@@ -230,7 +211,7 @@ void renderScene(){
 	glRotatef(yaw, 0.0f, 1.0f, 0.0f);
 	glTranslatef(-camPosition.x, -camPosition.y, -camPosition.z);
 
-	drawSpline();
+	curve.Draw();
 
 	glEnable(GL_LIGHTING);
 

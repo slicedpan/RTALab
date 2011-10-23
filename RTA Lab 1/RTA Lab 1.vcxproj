@@ -78,12 +78,16 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Bezier.h" />
+    <ClInclude Include="Curve.h" />
     <ClInclude Include="glm\glm.h" />
     <ClInclude Include="glm\glmint.h" />
+    <ClInclude Include="Spider.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Bezier.cpp" />
     <ClCompile Include="glm\glm.c" />
     <ClCompile Include="glm\glmimg.c" />
     <ClCompile Include="glm\glmimg_devil.c" />
@@ -93,6 +97,7 @@
     <ClCompile Include="glm\glmimg_sim.c" />
     <ClCompile Include="glm\glm_util.c" />
     <ClCompile Include="RTA Lab 1.cpp" />
+    <ClCompile Include="Spider.cpp" />
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
