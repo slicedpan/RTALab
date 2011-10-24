@@ -98,100 +98,6 @@ void glutPrint(float x, float y, LPVOID font, char* text, float r, float g, floa
     if(!blending) glDisable(GL_BLEND);
 }
 
-void renderSpider()
-{
-	float width = 0.5f;	
-	float length = 1.0f;
-	float legAngle = 20.0f;
-	float pos[3];
-
-	float t = (sinf(rotationAngle / 100.0f) / 2.0f) + 0.5f;
-
-	//spider
-	glPushMatrix();
-	Vec3 p = curve.Position(t);
-	glTranslatef(p[0], p[1], p[2]);
-
-	Vec3 nextP = curve.Position(t + 0.01f);
-	float spiderYaw = atan2f(nextP[0] - p[0], nextP[2] - p[2]);
-	glRotatef(spiderYaw * (180.0f / M_PI), 0.0f, 1.0f, 0.0f); 
-	//legs
-	glPushMatrix();
-
-	pos[0] = width;
-	pos[1] = 0.0f;
-	pos[2] = 0.0f;
-	renderLeg(2 * legAngle, pos, 0.0f);
-	pos[0] = -width;
-	renderLeg(180.0f - (2.0f * legAngle), pos, M_PI);
-
-	pos[2] = length / 3.0f;
-	pos[0] = -width * 1.1f;
-	renderLeg(180.0f - legAngle, pos, 1.5f * M_PI);
-
-	pos[0] = width * 1.1f;
-	renderLeg(legAngle, pos, 0.5f * M_PI);
-
-	pos[2] *= 2.0f;
-	renderLeg(0.0f, pos, M_PI);
-
-	pos[0] = - width * 1.1f;
-	renderLeg(180.0f, pos, 0.0f);
-
-	pos[2] = length;
-	pos[0] = -width;
-	renderLeg(180.0f + legAngle, pos, 0.5f * M_PI);
-
-	pos[0] = width;
-	renderLeg(-legAngle, pos, 1.5f * M_PI);
-
-	glPushMatrix();
-	glTranslatef(0.0f, 0.0f, 0.5f);
-	glScalef(1.0f, 1.2f, 2.0f);
-	gluSphere(nQ, 0.5f, 15, 15);
-	glPopMatrix();
-
-	glTranslatef(0.0f, 0.35f, -0.8f);
-	gluSphere(nQ, 0.8f, 15, 15);
-
-	glPopMatrix();
-	//head
-	glPushMatrix();
-	glTranslatef(0.0f, 0.1f, 1.3f);
-	glScalef(0.8f, 0.8f, 0.8f);
-	glEnable(GL_TEXTURE_2D);	
-	glCallList(skullList);
-	glPopMatrix();
-
-	glPopMatrix();
-}
-
-void renderLeg(float orientation, float* position, float timeOffset)
-{
-	glPushMatrix();	
-
-	glTranslatef(*position, *(position + 1), *(position + 2));
-	glRotatef(orientation, 0.0f, 1.0f, 0.0f);
-	glRotatef(22.5f * sinf(time * speed + timeOffset) + 45.0f, 0.0f, 0.0f, 1.0f);
-	glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
-
-	gluCylinder(nQ, 0.15, 0.15, 1.5, 30, 5);
-	gluSphere(nQ, 0.15, 5, 5);
-
-	glTranslatef(0.0f, 0.0f, 1.5f);
-	glRotatef(20.0f * cosf(time * speed + timeOffset) + 75.0f, 1.0f, 0.0f, 0.0f);
-
-	gluCylinder(nQ, 0.15, 0.15, 2.0f, 30, 5);
-	gluSphere(nQ, 0.15, 5, 5);
-
-	glTranslatef(0.0f, 0.0f, 2.0f);
-	glRotatef(-10.0f * cosf(time * speed + timeOffset) - 20.0f, 1.0f, 0.0f, 0.0f);
-	gluCylinder(nQ, 0.15, 0.03, 0.75f, 30, 5);
-	gluSphere(nQ, 0.16, 5, 5);
-
-	glPopMatrix();
-}
-
 void renderScene(){
         
     // Clear framebuffer & depth buffer
@@ -226,7 +132,7 @@ void renderScene(){
 	spider->Draw();
 
 	glCallList(wallList);
-	glCallList(floorList);	
+	//glCallList(floorList);	
 
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_LIGHTING);
@@ -267,7 +173,10 @@ void updateScene(){
 	while(timeGetTime()-lastTickCount<16);
 	lastTickCount=timeGetTime();
     
-	spider->Update(time);
+	if (keyStates['p'] == true)
+	{
+		spider->Update(time);
+	}
 
     // Increment angle for next frame
     rotationAngle+=2;
