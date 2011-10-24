@@ -14,16 +14,45 @@ Spider::Spider(Curve* curveToFollow)
 	_curve = curveToFollow;
 
 #pragma region Foot Position Limits
-	minAngle[frontRight] = 5.0f;
-	maxAngle[frontRight] = 40.0f;
-	minDist[frontRight] = 0.3f;
-	maxDist[frontRight] = 1.0f;
+	minAngle[frontRight] = 90.0f;
+	maxAngle[frontRight] = 115.0f;
+	minDist[frontRight] = 1.3f;
+	maxDist[frontRight] = 4.0f;
 
-	minAngle[secondRight] = 45.0f;
-	maxAngle[secondRight] = 90.0f;
+	minAngle[secondRight] = 135.0f;
+	maxAngle[secondRight] = 180.0f;
 	minDist[secondRight] = 1.0f;
-	maxDist[secondRight] = 2.3f;
+	maxDist[secondRight] = 2.5f;
 
+	minAngle[thirdRight] = 180.0f;
+	maxAngle[thirdRight] = 225.0f;
+	minDist[thirdRight] = 1.0f;
+	maxDist[thirdRight] = 2.5f;
+
+	minAngle[backRight] = 245.0f;
+	maxAngle[backRight] = 270.0f;
+	minDist[backRight] = 1.3f;
+	maxDist[backRight] = 4.0f;
+
+	minAngle[frontLeft] = 75.0f;
+	maxAngle[frontLeft] = 90.0f;
+	minDist[frontLeft] = 1.3f;
+	maxDist[frontLeft] = 4.0f;
+
+	minAngle[secondLeft] = 0.0f;
+	maxAngle[secondLeft] = 45.0f;
+	minDist[secondLeft] = 1.0f;
+	maxDist[secondLeft] = 2.5f;
+
+	minAngle[thirdLeft] = -45.0f;
+	maxAngle[thirdLeft] = 0.0f;
+	minDist[thirdLeft] = 1.0f;
+	maxDist[thirdLeft] = 2.5f;
+
+	minAngle[backLeft] = 270.0f;
+	maxAngle[backLeft] = 295.0f;
+	minDist[backLeft] = 1.3f;
+	maxDist[backLeft] = 4.0f;
 #pragma endregion
 
 #pragma region Leg Stuff
