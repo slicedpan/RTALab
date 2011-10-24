@@ -1,7 +1,7 @@
 #include "svl/svl.h"
 #include "Curve.h"
 
-class Bezier : Curve
+class Bezier : public Curve
 {
 public:
 	Vec3 Position(float t);

@@ -9,6 +9,7 @@
 #include "svl/SVL.h"
 #include "svl/SVLgl.h"
 #include "Bezier.h"
+#include "Spider.h"
 
 void setupScene();
 void updateScene();
@@ -39,8 +40,6 @@ Vec3 p2(0.0, 1.5, 5.0);
 Vec3 p3(5.0, 1.5, 10.0);
 Vec3 p4(2.5, 1.5, 15.0);
 
-Bezier curve(p1, p2, p3, p4);
-
 struct _position
 {
 	float x;
@@ -59,6 +58,9 @@ GLuint wallList;
 GLMmodel * floorModel;
 GLuint floorTex;
 GLuint floorList;
+
+Bezier curve(p1, p2, p3, p4);
+Spider spider (&curve);
 
 bool		wireframe=false;
 int         windowId;
@@ -195,13 +197,10 @@ void renderScene(){
     // Clear framebuffer & depth buffer
 	float pos[3];
 
-
 	glClearColor(0.0, 0.0, 0.0, 0.0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 
-	//Enable lighting
-  
+	//Enable lighting  
 
     // Reset Modelview matrix      	
     glMatrixMode(GL_MODELVIEW);
@@ -224,7 +223,7 @@ void renderScene(){
 	glLightfv(GL_LIGHT0, GL_POSITION, left_light_position);
 	glLightfv(GL_LIGHT1, GL_POSITION, right_light_position);
 
-	renderSpider();
+	spider.Draw();
 
 	glCallList(wallList);
 	glCallList(floorList);	
@@ -240,7 +239,7 @@ void renderScene(){
 
     // Swap double buffer for flicker-free animation
     glutSwapBuffers();
-        
+
 }
 
 void mouseMove(int x, int y)
@@ -268,6 +267,8 @@ void updateScene(){
 	while(timeGetTime()-lastTickCount<16);
 	lastTickCount=timeGetTime();
     
+	spider.Update(time);
+
     // Increment angle for next frame
     rotationAngle+=2;
 	time += 0.016f;
@@ -371,9 +372,7 @@ void setupScene(){
 	glutSetCursor(GLUT_CURSOR_NONE); 
 
 	float junk;	
-
-	skullModel = glmReadOBJ("skull.obj");
-	skullList = glmList(skullModel, GLM_SMOOTH | GLM_MATERIAL);
+	
 	floorModel = glmReadOBJ("floor.obj");
 	floorList = glmList(floorModel, GLM_SMOOTH);
 	wallModel = glmReadOBJ("walls.obj");
