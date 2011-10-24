@@ -19,5 +19,9 @@ private:
 	GLUquadric* nQ;
 	float time;
 	GLuint skullList;
+	float pos[8][3];
+	float angle[8];
+	float phase[8];
+	Vec3 footPoint[8];
 };
 

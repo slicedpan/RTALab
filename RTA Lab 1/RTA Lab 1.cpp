@@ -60,7 +60,7 @@ GLuint floorTex;
 GLuint floorList;
 
 Bezier curve(p1, p2, p3, p4);
-Spider spider (&curve);
+Spider* spider;
 
 bool		wireframe=false;
 int         windowId;
@@ -223,7 +223,7 @@ void renderScene(){
 	glLightfv(GL_LIGHT0, GL_POSITION, left_light_position);
 	glLightfv(GL_LIGHT1, GL_POSITION, right_light_position);
 
-	spider.Draw();
+	spider->Draw();
 
 	glCallList(wallList);
 	glCallList(floorList);	
@@ -267,7 +267,7 @@ void updateScene(){
 	while(timeGetTime()-lastTickCount<16);
 	lastTickCount=timeGetTime();
     
-	spider.Update(time);
+	spider->Update(time);
 
     // Increment angle for next frame
     rotationAngle+=2;
@@ -378,6 +378,7 @@ void setupScene(){
 	wallModel = glmReadOBJ("walls.obj");
 	glmVertexNormals(wallModel, 90, false);
 	wallList = glmList(wallModel, GLM_SMOOTH);
+	spider = new Spider(&curve);
 
 	//skullTex = glmLoadTexture("skulltex.ppm", true, false, false, true, &junk, &junk);
 	
