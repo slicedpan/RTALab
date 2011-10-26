@@ -132,6 +132,12 @@ void renderScene(){
 	spider->Draw();
 
 	glCallList(wallList);
+	glBegin(GL_QUADS);
+	glVertex3f(25.0f, 0.0f, 25.0f);
+	glVertex3f(-25.0f, 0.0f, 25.0f);	
+	glVertex3f(-25.0f, 0.0f, -25.0f);
+	glVertex3f(25.0f, 0.0f, -25.0f);	
+	glEnd();
 	//glCallList(floorList);	
 
 	glDisable(GL_TEXTURE_2D);
@@ -252,8 +258,8 @@ void setupScene(){
 	std::cout<<"Initializing scene..."<<std::endl;
     
 	//Set up Lighting Stuff
-	float quadAtten = 0.01f;
-	float linearAtten = 0.01f;
+	float quadAtten = 0.001f;
+	float linearAtten = 0.001f;
 
 	glLightfv(GL_LIGHT0, GL_POSITION, left_light_position);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, white_light);

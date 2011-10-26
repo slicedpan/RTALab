@@ -21,7 +21,7 @@ public:
 	static const int backRight = 7;
 
 private:
-	void DrawConstraints();
+	void drawConstraints();
 	Curve* _curve;
 	Vec3 _position;
 	float _yaw;
@@ -38,5 +38,8 @@ private:
 	float minAngle[8];
 	float minDist[8];
 	float maxDist[8];
+	float colors[8][3];
+	void computeFootPoints();
+	void drawFeet();
 };
 
