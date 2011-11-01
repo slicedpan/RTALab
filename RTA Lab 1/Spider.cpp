@@ -149,9 +149,9 @@ void Spider::Update(float ticks)
 		float* point = footPoint[i].Ref();
 		angle[i] = (maxAngle[i] - minAngle[i]) / 2.0f;
 		float dist = (maxDist[i] - minDist[i]) / 2.0f;
-		point[0] = cosf(-_yaw + angle[i] / (180.0f / M_PI)) * dist + _position[0];
+		point[0] = cosf((-_yaw + angle[i]) / (180.0f / M_PI)) * dist + _position[0];
 		point[1] = 0.1f;
-		point[2] = sinf(-_yaw + angle[i] / (180.0f / M_PI)) * dist + _position[2];
+		point[2] = sinf((-_yaw + angle[i]) / (180.0f / M_PI)) * dist + _position[2];
 	}
 }
 
