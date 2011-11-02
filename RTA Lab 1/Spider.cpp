@@ -250,15 +250,15 @@ void Spider::Draw()
 
 	glPopMatrix(); //spider
 
-	/*
+	
 	for (int i = 0; i < 8; ++i)
 	{
 		if (legMoving[i])
 		{
-			legSpline[i].Draw();			
+			//legSpline[i].Draw();			
 		}
 	}
-	*/
+	
 
 	//drawFeet();
 	
