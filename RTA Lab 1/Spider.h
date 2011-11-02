@@ -3,6 +3,7 @@
 #include "Curve.h"
 #include "glut.h"
 #include "gl/glu.h"
+#include "Bezier.h"
 
 class Spider
 {
@@ -14,11 +15,14 @@ public:
 	static const int frontLeft = 0;
 	static const int frontRight = 1;
 	static const int secondLeft = 2;
-	static const int secondRight = 3;
-	static const int thirdLeft = 4;
+	static const int secondRight = 4;
+	static const int thirdLeft = 3;
 	static const int thirdRight = 5;
 	static const int backLeft = 6;
 	static const int backRight = 7;
+	float maxLegLength;
+	float upperLegLength;
+	float lowerLegLength;
 
 private:
 	void drawConstraints();
@@ -41,5 +45,11 @@ private:
 	float colors[8][3];
 	void computeFootPoints();
 	void drawFeet();
+	void renderLegs();
+	Mat4 _transform;
+	float legSplineParam[8];
+	Bezier legSpline[8];
+	Vec3 forwardVec;
+	void setFootCurve(int i);
 };
 

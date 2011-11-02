@@ -1,5 +1,5 @@
 #define _USE_MATH_DEFINES
-
+#define VL_DEBUG
 #include <windows.h>
 #include <mmsystem.h>	// ditto
 #include <iostream>		// I/O

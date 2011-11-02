@@ -8,10 +8,20 @@ Vec3 Bezier::Position(float t)
 
 Bezier::Bezier(Vec3 pp1, Vec3 pp2, Vec3 pp3, Vec3 pp4)
 {
-	p[0] = pp1;
-	p[1] = pp2;
-	p[2] = pp3;
-	p[3] = pp4;
+	SetPoints(pp1, pp2, pp3, pp4);
+}
+
+Bezier::Bezier()
+{
+
+}
+
+void Bezier::SetPoints(Vec3 pp1, Vec3 pp2, Vec3 pp3, Vec3 pp4)
+{
+	p[3] = pp1;
+	p[2] = pp2;
+	p[1] = pp3;
+	p[0] = pp4;
 }
 
 void Bezier::Draw()
