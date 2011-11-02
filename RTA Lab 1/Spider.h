@@ -51,5 +51,6 @@ private:
 	Bezier legSpline[8];
 	Vec3 forwardVec;
 	void setFootCurve(int i);
+	float speed;
 };
 

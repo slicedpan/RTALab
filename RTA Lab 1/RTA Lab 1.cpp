@@ -22,7 +22,7 @@ void renderLeg(float orientation, float* position, float timeOffset);
 void drawSpline();
 
 bool *keyStates = new bool[256];
-bool visibleSpline = true;
+bool visibleSpline = false;
 char msg[256];
 
 int rotationAngle=0;
@@ -35,10 +35,10 @@ int mouseX = 400, mouseY = 300;
 
 float radiansToDegrees = 57.2957795f;
 
-Vec3 p1(0.0, 1.5, 0.0);
-Vec3 p2(0.0, 1.5, 5.0);
-Vec3 p3(5.0, 1.5, 10.0);
-Vec3 p4(2.5, 1.5, 15.0);
+Vec3 p1(-2.5, 1.5, -10.0);
+Vec3 p2(0.0, 1.5, -2.5);
+Vec3 p3(5.0, 1.5, 7.0);
+Vec3 p4(2.5, 1.5, 12.5);
 
 struct _position
 {
@@ -66,7 +66,7 @@ bool		wireframe=false;
 int         windowId;
 DWORD		lastTickCount;
 GLfloat white_light[] = {1.0, 1.0, 1.0, 1.0};
-GLfloat left_light_position[] = {0.0f, 6.0f, 4.0f, 1.0f}; 
+GLfloat left_light_position[] = {0.0f, 6.0f, 15.0f, 1.0f}; 
 GLfloat right_light_position[] = {0.0f, 6.0f, -4.0f, 1.0f};
 GLfloat grey_ambient[] =
 {0.01745, 0.01745, 0.01745}, grey_diffuse[] =
@@ -116,7 +116,8 @@ void renderScene(){
 	glRotatef(yaw, 0.0f, 1.0f, 0.0f);
 	glTranslatef(-camPosition.x, -camPosition.y, -camPosition.z);
 
-	//curve.Draw();
+	if (visibleSpline)
+		curve.Draw();
 
 	glEnable(GL_LIGHTING);
 
@@ -181,8 +182,10 @@ void updateScene(){
     
 	if (keyStates['p'] == true)
 	{
-		spider->Update(time);
+		//spider->Update(time);
 	}
+
+	spider->Update(time);
 
     // Increment angle for next frame
     rotationAngle+=2;
@@ -228,6 +231,8 @@ void updateScene(){
 void keyup(unsigned char key, int x, int y)
 {
 	keyStates[key] = false;
+	if (key == 'q')
+		visibleSpline = !visibleSpline;
 }
 
 void keypress(unsigned char key, int x, int y){

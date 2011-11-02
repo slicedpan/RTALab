@@ -18,6 +18,8 @@ Spider::Spider(Curve* curveToFollow)
 	upperLegLength = 1.5f;
 	maxLegLength = lowerLegLength + upperLegLength;
 
+	speed = 1.1f;
+
 #pragma region Foot Position Limits
 	minAngle[frontRight] = 90.0f;
 	maxAngle[frontRight] = 115.0f;
@@ -121,6 +123,8 @@ Spider::Spider(Curve* curveToFollow)
 
 #pragma endregion
 
+#pragma region Foot Positions
+
 	_transform = HRot4(Vec3(0.0f, 1.0f, 0.0f), _yaw / (180.0f / M_PI)) * HTrans4(_position);	
 
 	float dist[8];
@@ -159,6 +163,8 @@ Spider::Spider(Curve* curveToFollow)
 		legMoving[i] = false;
 	}
 
+#pragma endregion
+
 }
 
 Spider::~Spider(void)
@@ -167,7 +173,7 @@ Spider::~Spider(void)
 
 void Spider::Update(float ticks)
 {
-	time += 0.016f;
+	time += 0.016f * speed;
 	float t = (fmodf(time, 10.0f)) / 10.0f;
 	//float t = (sinf(ticks) / 2.0f) + 0.5f;	
 	if (_curve)
@@ -312,6 +318,8 @@ void Spider::renderLegs()
 
 		gluCylinder(nQ, 0.15f, 0.05f, lowerLegLength, 30, 5);
 		gluSphere(nQ, 0.15f, 5, 5);
+		glTranslatef(0.0f, 0.0f, lowerLegLength);
+		gluSphere(nQ, 0.05, 5, 5);
 
 		glPopMatrix();
 
@@ -431,7 +439,7 @@ void Spider::setFootCurve(int i)
 	Vec3 worldPos = proj(Vec4(pos[i][0], pos[i][1], pos[i][2], 1.0f) * _transform);	
 	Mat4 endTransform;
 	float t = (fmodf(time, 10.0f)) / 10.0f;
-	t += 0.032f;
+	t += 0.032f * speed;
 	Vec3 endSpiderPos = _curve->Position(t);
 	Vec3 endSpiderNext = _curve->Position(t + 0.001f);
 	float endYaw = atan2f(endSpiderNext[0] - endSpiderPos[0], endSpiderNext[2] - endSpiderPos[2]);
