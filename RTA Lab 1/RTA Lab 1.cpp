@@ -116,7 +116,7 @@ void renderScene(){
 	glRotatef(yaw, 0.0f, 1.0f, 0.0f);
 	glTranslatef(-camPosition.x, -camPosition.y, -camPosition.z);
 
-	curve.Draw();
+	//curve.Draw();
 
 	glEnable(GL_LIGHTING);
 

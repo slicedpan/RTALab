@@ -37,7 +37,7 @@ Spider::Spider(Curve* curveToFollow)
 	minAngle[backRight] = 215.0f;
 	maxAngle[backRight] = 250.0f;
 	minDist[backRight] = 1.5f;
-	maxDist[backRight] = 3.5f;
+	maxDist[backRight] = 3.45f;
 
 	minAngle[frontLeft] = 65.0f;
 	maxAngle[frontLeft] = 90.0f;
@@ -57,7 +57,7 @@ Spider::Spider(Curve* curveToFollow)
 	minAngle[backLeft] = 290.0f;
 	maxAngle[backLeft] = 325.0f;
 	minDist[backLeft] = 1.5f;
-	maxDist[backLeft] = 3.5f;
+	maxDist[backLeft] = 3.45f;
 #pragma endregion
 
 #pragma region Leg Stuff
@@ -137,7 +137,7 @@ Spider::Spider(Curve* curveToFollow)
 
 	angle[secondLeft] = maxAngle[secondLeft];
 	dist[secondLeft] = ((maxDist[secondLeft] - minDist[secondLeft]) / 2.0f) + minDist[secondLeft];
-	angle[secondRight] = minAngle[secondLeft];
+	angle[secondRight] = minAngle[secondRight];
 	dist[secondRight] = ((maxDist[secondRight] - minDist[secondRight]) / 2.0f) + minDist[secondRight];
 
 	angle[thirdLeft] = minAngle[thirdLeft];
@@ -237,13 +237,14 @@ void Spider::Draw()
 	glCallList(skullList);
 	glPopMatrix(); // head
 
-	drawConstraints();	
+	//drawConstraints();	
 	renderLegs();
 
 	glPopMatrix(); //legs
 
 	glPopMatrix(); //spider
 
+	/*
 	for (int i = 0; i < 8; ++i)
 	{
 		if (legMoving[i])
@@ -251,8 +252,9 @@ void Spider::Draw()
 			legSpline[i].Draw();			
 		}
 	}
-	
-	drawFeet();
+	*/
+
+	//drawFeet();
 	
 }
 
@@ -308,7 +310,7 @@ void Spider::renderLegs()
 		glTranslatef(0.0f, 0.0f, upperLegLength);
 		glRotatef(elbowAngle * (180.0f / M_PI), 1.0f, 0.0f, 0.0f);
 
-		gluCylinder(nQ, 0.15f, 0.1f, lowerLegLength, 30, 5);
+		gluCylinder(nQ, 0.15f, 0.05f, lowerLegLength, 30, 5);
 		gluSphere(nQ, 0.15f, 5, 5);
 
 		glPopMatrix();
@@ -454,6 +456,7 @@ void Spider::setFootCurve(int i)
 			endPoint[1] = 0.1f;	
 			endPoint[2] = sinf((legAngle) / (180.0f / M_PI)) * dist + pos[i][2];
 			endPoint = proj(Vec4(endPoint[0], endPoint[1], endPoint[2], 1.0f) * endTransform);
+			endPoint[1] = 0.0f;
 			Vec3 diff = endPoint - footPoint[i];			 
 			legSpline[i].SetPoints(footPoint[i], footPoint[i] + 0.3333 * diff + height, footPoint[i] + 0.6666 * diff + height, endPoint);
 		}
@@ -470,6 +473,7 @@ void Spider::setFootCurve(int i)
 			endPoint[1] = 0.1f;	
 			endPoint[2] = sinf((legAngle) / (180.0f / M_PI)) * dist + pos[i][2];
 			endPoint = proj(Vec4(endPoint[0], endPoint[1], endPoint[2], 1.0f) * endTransform);
+			endPoint[1] = 0.0f;
 			Vec3 diff = endPoint - footPoint[i];			 
 			legSpline[i].SetPoints(footPoint[i], footPoint[i] + 0.3333 * diff + height, footPoint[i] + 0.6666 * diff + height, endPoint);
 		}
@@ -486,6 +490,7 @@ void Spider::setFootCurve(int i)
 			endPoint[1] = 0.1f;	
 			endPoint[2] = sinf((legAngle) / (180.0f / M_PI)) * dist + pos[i][2];
 			endPoint = proj(Vec4(endPoint[0], endPoint[1], endPoint[2], 1.0f) * endTransform);
+			endPoint[1] = 0.0f;
 			Vec3 diff = endPoint - footPoint[i];			 
 			legSpline[i].SetPoints(footPoint[i], footPoint[i] + 0.3333 * diff + height, footPoint[i] + 0.6666 * diff + height, endPoint);
 		}
@@ -506,6 +511,7 @@ void Spider::setFootCurve(int i)
 			 endPoint[1] = 0.1f;	
 			 endPoint[2] = sinf((angle) / (180.0f / M_PI)) * dist + pos[i][2];
 			 endPoint = proj(Vec4(endPoint[0], endPoint[1], endPoint[2], 1.0f) * endTransform);
+			 endPoint[1] = 0.0f;
 			 Vec3 diff = endPoint - footPoint[i];			 
 			 legSpline[i].SetPoints(footPoint[i], footPoint[i] + 0.3333 * diff + height, footPoint[i] + 0.6666 * diff + height, endPoint);
 		 }
