@@ -226,6 +226,14 @@ void updateScene(){
 	{
 		camPosition.y -= 0.2f;
 	}
+	if (keyStates['g'] == true)
+	{
+		spider->Advance();
+	}
+	if (keyStates['b'] == true)
+	{
+		spider->GoBackwards();
+	}
 }
 
 void keyup(unsigned char key, int x, int y)

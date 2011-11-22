@@ -20,6 +20,8 @@ Spider::Spider(Curve* curveToFollow)
 
 	speed = 1.1f;
 
+	endTransform.MakeDiag();
+
 #pragma region Foot Position Limits
 	minAngle[frontRight] = 90.0f;
 	maxAngle[frontRight] = 115.0f;
@@ -163,6 +165,9 @@ Spider::Spider(Curve* curveToFollow)
 		legMoving[i] = false;
 	}
 
+	_lastPosition = _position;
+	_lastYaw = _yaw;
+
 #pragma endregion
 
 }
@@ -171,9 +176,18 @@ Spider::~Spider(void)
 {
 }
 
-void Spider::Update(float ticks)
+void Spider::Advance()
 {
 	time += 0.016f * speed;
+}
+
+void Spider::GoBackwards()
+{
+	time -= 0.016f * speed;
+}
+
+void Spider::Update(float ticks)
+{
 	float t = (fmodf(time, 10.0f)) / 10.0f;
 	//float t = (sinf(ticks) / 2.0f) + 0.5f;	
 	if (_curve)
@@ -206,6 +220,8 @@ void Spider::Update(float ticks)
 	forwardVec = proj(Vec4(0.0f, 0.0f, 1.0f, 1.0f) * _transform);
 	forwardVec.Normalise();
 	computeFootPoints();
+	_lastPosition = _position;
+	_lastYaw = _yaw;
 }
 
 void Spider::Draw()
@@ -243,7 +259,6 @@ void Spider::Draw()
 	glCallList(skullList);
 	glPopMatrix(); // head
 
-	//drawConstraints();	
 	renderLegs();
 
 	glPopMatrix(); //legs
@@ -259,7 +274,12 @@ void Spider::Draw()
 		}
 	}
 	
-
+	drawConstraints();
+	float col[3];
+	col[0] = 1.0f;
+	col[1] = 0.0f;
+	col[2] = 0.0f;
+	drawConstraints(col, endTransform);
 	//drawFeet();
 	
 }
@@ -328,16 +348,26 @@ void Spider::renderLegs()
 
 void Spider::drawConstraints()
 {
+	float col[3];
+	col[0] = 1.0f;
+	col[1] = 0.5f;
+	col[2] = 0.0f;
+	drawConstraints(col, _transform);
+}
+
+void Spider::drawConstraints(float * color, Mat4 transform)
+{
 	glDisable(GL_LIGHTING);
 	for (int i = 0; i < 8; ++i)
 	{
 		glPushMatrix();
+		glMultMatrixf(transform.Ref());
 		float* point = pos[i];
 		glTranslatef(point[0], point[1] - 1.49f, point[2]);
 		float curAngle = -_yaw + minAngle[i];
 		float angleOffset = (maxAngle[i] - minAngle[i]) / 11.0f;
 		glBegin(GL_LINES);
-		glColor3f(1.0f, 0.5f, 0.0f);
+		glColor3f(*color, *(color + 1), *(color + 2));
 		glVertex3f(cosf(minAngle[i] / (180.0f / M_PI)) * minDist[i], 0.0f, sinf(minAngle[i] / (180.0f / M_PI)) * minDist[i]);
 		for (int j = 1; j < 11; ++j)
 		{
@@ -432,17 +462,28 @@ void Spider::computeFootPoints()
 	}
 }
 
+void Spider::moveLegTo(int leg, Vec3 position, float curveHeight, float speed)
+{
+	Vec3 diff = position - footPoint[leg];
+	Vec3 height(0.0f, curveHeight, 0.0f);
+	legMoving[leg] = true;
+	legSplineParam[leg] = 0.0f;
+	legSpline[leg].SetPoints(footPoint[leg], footPoint[leg] + 0.3333f * diff + height, footPoint[leg] + 0.6666f * diff + height, position);
+}
+
 void Spider::setFootCurve(int i)
 {
 	Vec3 endPoint;
-	Vec3 height (0.0f, 1.0f, 0.0f);
 	Vec3 worldPos = proj(Vec4(pos[i][0], pos[i][1], pos[i][2], 1.0f) * _transform);	
-	Mat4 endTransform;
+
 	float t = (fmodf(time, 10.0f)) / 10.0f;
 	t += 0.032f * speed;
-	Vec3 endSpiderPos = _curve->Position(t);
-	Vec3 endSpiderNext = _curve->Position(t + 0.001f);
-	float endYaw = atan2f(endSpiderNext[0] - endSpiderPos[0], endSpiderNext[2] - endSpiderPos[2]);
+
+	//float endYaw = atan2f(endSpiderNext[0] - endSpiderPos[0], endSpiderNext[2] - endSpiderPos[2]);
+
+	float endYaw = (_yaw + (_yaw - _lastYaw) * 30.0f) / (180.0f / M_PI);
+	Vec3 endSpiderPos = (_position - _lastPosition) * 30.0f + _position;
+
 	endTransform = HRot4(Vec3(0.0, 1.0f, 0.0f), endYaw) * HTrans4(endSpiderPos);
 
 	float linearDist = sqrtf(powf(worldPos[0] - footPoint[i][0], 2) + powf(worldPos[2] - footPoint[i][2], 2));
@@ -455,73 +496,59 @@ void Spider::setFootCurve(int i)
 	if (i == 0 || i == 1) //front legs
 	{		
 		if (linearDist < minDist[i] || angle < minAngle[i] || angle > maxAngle[i] || linearDist > maxDist[i])
-		{			 
-			legMoving[i] = true;
-			legSplineParam[i] = 0.0f;
+		{
 			float legAngle = ((maxAngle[i] - minAngle[i]) / 2.0f) + minAngle[i];
-			float dist = maxDist[i] - 0.05f;
+			float dist = ((maxDist[i] - minDist[i]) / 2.0f) + minDist[i];
 			endPoint[0] = cosf((legAngle) / (180.0f / M_PI)) * dist + pos[i][0];
 			endPoint[1] = 0.1f;	
 			endPoint[2] = sinf((legAngle) / (180.0f / M_PI)) * dist + pos[i][2];
 			endPoint = proj(Vec4(endPoint[0], endPoint[1], endPoint[2], 1.0f) * endTransform);
 			endPoint[1] = 0.0f;
-			Vec3 diff = endPoint - footPoint[i];			 
-			legSpline[i].SetPoints(footPoint[i], footPoint[i] + 0.3333 * diff + height, footPoint[i] + 0.6666 * diff + height, endPoint);
+			moveLegTo(i, endPoint, 1.0f, 1.0f);
 		}
 	}
 	else if (i == 2 || i == 3) //left legs
 	{
 		if (linearDist < minDist[i] || angle < minAngle[i] || linearDist > maxDist[i])
-		{			 
-			legMoving[i] = true;
-			legSplineParam[i] = 0.0f;
-			float legAngle = maxAngle[i];
+		{		 
+
+			float legAngle = ((maxAngle[i] - minAngle[i]) / 2.0f) + minAngle[i];
 			float dist = ((maxDist[i] - minDist[i]) / 2.0f) + minDist[i];
 			endPoint[0] = cosf((legAngle) / (180.0f / M_PI)) * dist + pos[i][0];
 			endPoint[1] = 0.1f;	
 			endPoint[2] = sinf((legAngle) / (180.0f / M_PI)) * dist + pos[i][2];
 			endPoint = proj(Vec4(endPoint[0], endPoint[1], endPoint[2], 1.0f) * endTransform);
 			endPoint[1] = 0.0f;
-			Vec3 diff = endPoint - footPoint[i];			 
-			legSpline[i].SetPoints(footPoint[i], footPoint[i] + 0.3333 * diff + height, footPoint[i] + 0.6666 * diff + height, endPoint);
+			moveLegTo(i, endPoint, 1.0f, 1.0f);
 		}
 	}
 	else if (i == 4 || i == 5) //right legs
 	{
 		if (linearDist < minDist[i] || angle > maxAngle[i] || linearDist > maxDist[i])
-		{			 
-			legMoving[i] = true;
-			legSplineParam[i] = 0.0f;
-			float legAngle = minAngle[i];
+		{	
+			float legAngle = ((maxAngle[i] - minAngle[i]) / 2.0f) + minAngle[i];
 			float dist = ((maxDist[i] - minDist[i]) / 2.0f) + minDist[i];
 			endPoint[0] = cosf((legAngle) / (180.0f / M_PI)) * dist + pos[i][0];
 			endPoint[1] = 0.1f;	
 			endPoint[2] = sinf((legAngle) / (180.0f / M_PI)) * dist + pos[i][2];
 			endPoint = proj(Vec4(endPoint[0], endPoint[1], endPoint[2], 1.0f) * endTransform);
 			endPoint[1] = 0.0f;
-			Vec3 diff = endPoint - footPoint[i];			 
-			legSpline[i].SetPoints(footPoint[i], footPoint[i] + 0.3333 * diff + height, footPoint[i] + 0.6666 * diff + height, endPoint);
+			moveLegTo(i, endPoint, 1.0f, 1.0f);
 		}
 	}
 	else //backlegs
 	{
-		if (angle < minAngle[i] || angle > maxAngle[i])
-		{
-			i = i;
-		}
-		if (linearDist > maxDist[i] || angle < minAngle[i] || angle > maxAngle[i])
+		if (linearDist > maxDist[i] || linearDist < minDist[i] || angle < minAngle[i] || angle > maxAngle[i])
 		 {
-			 legMoving[i] = true;
-			 legSplineParam[i] = 0.0f;
 			 float angle = ((maxAngle[i] - minAngle[i]) / 2.0f) + minAngle[i];
-			 float dist = minDist[i] + 0.05f;
+			 float dist = ((maxDist[i] - minDist[i]) / 2.0f) + minDist[i];
 			 endPoint[0] = cosf((angle) / (180.0f / M_PI)) * dist + pos[i][0];
 			 endPoint[1] = 0.1f;	
 			 endPoint[2] = sinf((angle) / (180.0f / M_PI)) * dist + pos[i][2];
 			 endPoint = proj(Vec4(endPoint[0], endPoint[1], endPoint[2], 1.0f) * endTransform);
 			 endPoint[1] = 0.0f;
-			 Vec3 diff = endPoint - footPoint[i];			 
-			 legSpline[i].SetPoints(footPoint[i], footPoint[i] + 0.3333 * diff + height, footPoint[i] + 0.6666 * diff + height, endPoint);
+			 moveLegTo(i, endPoint, 1.0f, 1.0f);
 		 }
-	}
+	}	
 }
+

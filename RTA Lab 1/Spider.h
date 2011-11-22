@@ -12,6 +12,8 @@ public:
 	~Spider(void);
 	void Draw();
 	void Update(float ticks);
+	void Advance();
+	void GoBackwards();
 	static const int frontLeft = 0;
 	static const int frontRight = 1;
 	static const int secondLeft = 2;
@@ -25,10 +27,14 @@ public:
 	float lowerLegLength;
 
 private:
+	void drawConstraints(float * color, Mat4 transform);
 	void drawConstraints();
+	void moveLegTo(int leg, Vec3 position, float curveHeight, float curveSpeed);
 	Curve* _curve;
 	Vec3 _position;
+	Vec3 _lastPosition;
 	float _yaw;
+	float _lastYaw;
 	void renderLeg(float orientation, float * position, float phase);
 	GLUquadric* nQ;
 	float time;
@@ -52,5 +58,6 @@ private:
 	Vec3 forwardVec;
 	void setFootCurve(int i);
 	float speed;
+	Mat4 endTransform;
 };
 
