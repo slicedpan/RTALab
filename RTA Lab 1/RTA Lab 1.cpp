@@ -112,12 +112,33 @@ void renderScene(){
     glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
+	/*
+
 	glRotatef(pitch, -1.0f, 0.0f, 0.0f);
 	glRotatef(yaw, 0.0f, 1.0f, 0.0f);
 	glTranslatef(-camPosition.x, -camPosition.y, -camPosition.z);
 
+	*/
+	Mat4 camRot;
+	camRot.MakeDiag();
+	camRot *= HRot4(Vec3(-1.0f, 0.0f, 0.0f), pitch * (M_PI / 180.0f));
+	camRot *= HRot4(Vec3(0.0f, -1.0f, 0.0f), yaw * (M_PI / 180.0f));
+
+	Vec3 camPos(0.0f, 3.0f, -9.0f);
+	Vec3 spiderPos = spider->getPos();
+
+	camPos = proj(Vec4(camPos[0], camPos[1], camPos[2], 1.0f) * camRot * HTrans4(spiderPos));	
+	if (camPos[1] < 0.5f)
+		camPos[1] = 0.5f;
+	gluLookAt(camPos[0], camPos[1], camPos[2], spiderPos[0], spiderPos[1] + 3.0f, spiderPos[2], 0.0, 1.0, 0.0);
+
 	if (visibleSpline)
 		curve.Draw();
+
+	glPushMatrix();
+	glTranslatef(camPos[0], camPos[1], camPos[2]);
+	//gluSphere(nQ, 0.2f, 5, 5);
+	glPopMatrix();
 
 	glEnable(GL_LIGHTING);
 
@@ -185,8 +206,6 @@ void updateScene(){
 		//spider->Update(time);
 	}
 
-	spider->Update(time);
-
     // Increment angle for next frame
     rotationAngle+=2;
 	time += 0.016f;
@@ -196,6 +215,16 @@ void updateScene(){
     glutPostRedisplay();
 	yaw += (mouseX - 400) / 10.0f;
 	pitch += (300 - mouseY) / 10.0f;
+
+	if (pitch > 85.0f)
+		pitch = 85.0f;
+	else if (pitch < -89.0f)
+		pitch = -89.0f;
+
+	if (yaw > 360.0f)
+		yaw -= 360.0f;
+	else if (yaw < 0)
+		yaw += 360.0f;
 
 	memset(msg, 0, 256);
 	sprintf(msg, "x: %d, y: %d, dy: %d, dy: %d", mouseX, mouseY, mouseX - 400, 300 - mouseY);
@@ -226,14 +255,36 @@ void updateScene(){
 	{
 		camPosition.y -= 0.2f;
 	}
-	if (keyStates['g'] == true)
+	if (keyStates['t'] == true)
 	{
 		spider->Advance();
+		spider->SetTargetYaw(yaw);
 	}
-	if (keyStates['b'] == true)
+	if (keyStates['g'] == true)
 	{
 		spider->GoBackwards();
+		spider->SetTargetYaw(yaw);
 	}
+	if (keyStates['f'] == true)
+	{
+		spider->GoLeft();
+		spider->SetTargetYaw(yaw);
+	}
+	if (keyStates['h'] == true)
+	{
+		spider->GoRight();
+		spider->SetTargetYaw(yaw);
+	}
+	if (keyStates['r'] == true)
+	{
+		spider->TurnLeft();
+	}
+	if (keyStates['y'] == true)
+	{
+		spider->TurnRight();
+	}
+
+	spider->Update(time);
 }
 
 void keyup(unsigned char key, int x, int y)

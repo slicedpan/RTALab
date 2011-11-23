@@ -14,6 +14,11 @@ public:
 	void Update(float ticks);
 	void Advance();
 	void GoBackwards();
+	void GoLeft();
+	void GoRight();
+	void TurnLeft();
+	void TurnRight();	
+	void SetTargetYaw(float yaw);
 	static const int frontLeft = 0;
 	static const int frontRight = 1;
 	static const int secondLeft = 2;
@@ -25,11 +30,15 @@ public:
 	float maxLegLength;
 	float upperLegLength;
 	float lowerLegLength;
+	Vec3 getPos();
+	float getYaw();
+	Mat4 getTransform();
 
 private:
 	void drawConstraints(float * color, Mat4 transform);
 	void drawConstraints();
 	void moveLegTo(int leg, Vec3 position, float curveHeight, float curveSpeed);
+	bool breaksConstraints(int leg, Vec3 point, Mat4 transform);
 	Curve* _curve;
 	Vec3 _position;
 	Vec3 _lastPosition;
@@ -56,8 +65,14 @@ private:
 	float legSplineParam[8];
 	Bezier legSpline[8];
 	Vec3 forwardVec;
+	Vec3 rightVec;
+	Vec3 velocity;
 	void setFootCurve(int i);
 	float speed;
+	float maxSpeed;
+	float turningSpeed;
+	float maxTurningSpeed;
 	Mat4 endTransform;
+	float targetYaw;
 };
 
