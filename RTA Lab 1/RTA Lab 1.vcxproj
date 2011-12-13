@@ -78,16 +78,21 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AABB.h" />
     <ClInclude Include="Bezier.h" />
     <ClInclude Include="Curve.h" />
+    <ClInclude Include="Entity.h" />
     <ClInclude Include="glm\glm.h" />
     <ClInclude Include="glm\glmint.h" />
+    <ClInclude Include="ModelManager.h" />
     <ClInclude Include="Spider.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AABB.cpp" />
     <ClCompile Include="Bezier.cpp" />
+    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="glm\glm.c" />
     <ClCompile Include="glm\glmimg.c" />
     <ClCompile Include="glm\glmimg_devil.c" />
@@ -96,6 +101,7 @@
     <ClCompile Include="glm\glmimg_sdl.c" />
     <ClCompile Include="glm\glmimg_sim.c" />
     <ClCompile Include="glm\glm_util.c" />
+    <ClCompile Include="ModelManager.cpp" />
     <ClCompile Include="RTA Lab 1.cpp" />
     <ClCompile Include="Spider.cpp" />
     <ClCompile Include="stdafx.cpp" />

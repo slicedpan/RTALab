@@ -10,6 +10,10 @@
 #include "svl/SVLgl.h"
 #include "Bezier.h"
 #include "Spider.h"
+#include "ModelManager.h"
+#include <vector>
+
+using namespace std;
 
 void setupScene();
 void updateScene();
@@ -22,7 +26,7 @@ void renderLeg(float orientation, float* position, float timeOffset);
 void drawSpline();
 
 bool *keyStates = new bool[256];
-bool visibleSpline = false;
+bool debug = false;
 char msg[256];
 
 int rotationAngle=0;
@@ -33,12 +37,14 @@ float speed = 5.0f;
 GLUquadric *nQ;
 int mouseX = 400, mouseY = 300;
 
+vector<Entity*> entities;
+
 float radiansToDegrees = 57.2957795f;
 
-Vec3 p1(-2.5, 1.5, -10.0);
-Vec3 p2(0.0, 1.5, -2.5);
-Vec3 p3(5.0, 1.5, 7.0);
-Vec3 p4(2.5, 1.5, 12.5);
+Vec3 p1(0.0, 1.5, 2.5);
+Vec3 p2(0.0, 1.5, 5.0);
+Vec3 p3(0.0, 1.5, 7.5);
+Vec3 p4(0.0, 1.5, 10.0);
 
 struct _position
 {
@@ -132,7 +138,7 @@ void renderScene(){
 		camPos[1] = 0.5f;
 	gluLookAt(camPos[0], camPos[1], camPos[2], spiderPos[0], spiderPos[1] + 3.0f, spiderPos[2], 0.0, 1.0, 0.0);
 
-	if (visibleSpline)
+	if (debug)
 		curve.Draw();
 
 	glPushMatrix();
@@ -151,7 +157,12 @@ void renderScene(){
 	glLightfv(GL_LIGHT0, GL_POSITION, left_light_position);
 	glLightfv(GL_LIGHT1, GL_POSITION, right_light_position);
 
-	spider->Draw();
+	for (unsigned int i = 0; i < entities.size(); ++i)
+	{
+		entities[i]->Draw();
+		if (debug)
+			entities[i]->DrawDebug();
+	}
 
 	glCallList(wallList);
 	glBegin(GL_QUADS);
@@ -283,15 +294,17 @@ void updateScene(){
 	{
 		spider->TurnRight();
 	}
-
-	spider->Update(time);
+	for (int i = 0; i < entities.size(); ++i)
+	{
+		entities[i]->Update(time);
+	}
 }
 
 void keyup(unsigned char key, int x, int y)
 {
 	keyStates[key] = false;
 	if (key == 'q')
-		visibleSpline = !visibleSpline;
+		debug = !debug;
 }
 
 void keypress(unsigned char key, int x, int y){
@@ -351,13 +364,21 @@ void setupScene(){
 	glutSetCursor(GLUT_CURSOR_NONE); 
 
 	float junk;	
-	
-	floorModel = glmReadOBJ("floor.obj");
-	floorList = glmList(floorModel, GLM_SMOOTH);
-	wallModel = glmReadOBJ("walls.obj");
-	glmVertexNormals(wallModel, 90, false);
-	wallList = glmList(wallModel, GLM_SMOOTH);
+
+	ModelManager * mm = ModelManager::CurrentInstance();
+
+	mm->Load("floor.obj", "floor", true);
+	floorList = mm->GetList("floor");
+
+	mm->Load("walls.obj", "walls", true);	
+	wallList = mm->GetList("walls");
+
+	mm->Load("skull.obj", "skull", true);
+
+
 	spider = new Spider(&curve);
+
+	entities.push_back(spider);
 
 	//skullTex = glmLoadTexture("skulltex.ppm", true, false, false, true, &junk, &junk);
 	

@@ -4,14 +4,15 @@
 #include "Spider.h"
 #include "glm\glm.h"
 #include "Bezier.h"
+#include "ModelManager.h"
 
 Spider::Spider(Curve* curveToFollow)
 {
 	nQ = gluNewQuadric();
 	time = 0.0f;
-	GLMmodel* skullModel = glmReadOBJ("skull.obj");
-	skullList = 21389213;
-	skullList = glmList(skullModel, GLM_SMOOTH | GLM_MATERIAL);
+	
+	skullList = ModelManager::CurrentInstance()->GetList("skull");
+
 	_curve = curveToFollow;
 
 	velocity.MakeZero();
@@ -297,7 +298,7 @@ void Spider::Update(float ticks)
 
 void Spider::SetTargetYaw(float yaw)
 {
-	targetYaw = yaw;
+	targetYaw = -yaw;
 }
 
 Vec3 Spider::getPos()
@@ -356,7 +357,14 @@ void Spider::Draw()
 
 	glPopMatrix(); //spider
 
-	
+}
+
+void Spider::DrawDebug()
+{
+	float col[3];
+	col[0] = 1.0f;
+	col[1] = 0.0f;
+	col[2] = 0.0f;
 	for (int i = 0; i < 8; ++i)
 	{
 		if (legMoving[i])
@@ -364,15 +372,9 @@ void Spider::Draw()
 			//legSpline[i].Draw();			
 		}
 	}
-	
 	drawConstraints();
-	float col[3];
-	col[0] = 1.0f;
-	col[1] = 0.0f;
-	col[2] = 0.0f;
 	drawConstraints(col, endTransform);
 	drawFeet();
-	
 }
 
 void Spider::drawFeet()

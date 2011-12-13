@@ -4,13 +4,15 @@
 #include "glut.h"
 #include "gl/glu.h"
 #include "Bezier.h"
+#include "Entity.h"
 
-class Spider
+class Spider: public Entity
 {
 public:
 	Spider(Curve* curveToFollow);
 	~Spider(void);
 	void Draw();
+	void DrawDebug();
 	void Update(float ticks);
 	void Advance();
 	void GoBackwards();
