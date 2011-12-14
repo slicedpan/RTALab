@@ -243,7 +243,7 @@ void Spider::Draw()
 	glCallList(skullList);
 	glPopMatrix(); // head
 
-	//drawConstraints();	
+	drawConstraints();	
 	renderLegs();
 
 	glPopMatrix(); //legs
@@ -432,6 +432,11 @@ void Spider::computeFootPoints()
 	}
 }
 
+bool Spider::violatesConstraints(int i, float dist, float angle)
+{	
+	return (dist + 0.0001f < minDist[i] || dist > maxDist[i] + 0.0001f || angle + 0.0001f < minAngle[i] || angle > maxAngle[i] + 0.0001f);
+}
+
 void Spider::setFootCurve(int i)
 {
 	Vec3 endPoint;
@@ -454,7 +459,7 @@ void Spider::setFootCurve(int i)
 	
 	if (i == 0 || i == 1) //front legs
 	{		
-		if (linearDist < minDist[i] || angle < minAngle[i] || angle > maxAngle[i] || linearDist > maxDist[i])
+		if (violatesConstraints(i, linearDist, angle))
 		{			 
 			legMoving[i] = true;
 			legSplineParam[i] = 0.0f;
@@ -471,7 +476,7 @@ void Spider::setFootCurve(int i)
 	}
 	else if (i == 2 || i == 3) //left legs
 	{
-		if (linearDist < minDist[i] || angle < minAngle[i] || linearDist > maxDist[i])
+		if (violatesConstraints(i, linearDist, angle))
 		{			 
 			legMoving[i] = true;
 			legSplineParam[i] = 0.0f;
@@ -488,7 +493,7 @@ void Spider::setFootCurve(int i)
 	}
 	else if (i == 4 || i == 5) //right legs
 	{
-		if (linearDist < minDist[i] || angle > maxAngle[i] || linearDist > maxDist[i])
+		if (violatesConstraints(i, linearDist, angle))
 		{			 
 			legMoving[i] = true;
 			legSplineParam[i] = 0.0f;
@@ -505,11 +510,7 @@ void Spider::setFootCurve(int i)
 	}
 	else //backlegs
 	{
-		if (angle < minAngle[i] || angle > maxAngle[i])
-		{
-			i = i;
-		}
-		if (linearDist > maxDist[i] || angle < minAngle[i] || angle > maxAngle[i])
+		if (violatesConstraints(i, linearDist, angle))
 		 {
 			 legMoving[i] = true;
 			 legSplineParam[i] = 0.0f;

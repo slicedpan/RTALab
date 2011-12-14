@@ -52,5 +52,6 @@ private:
 	Vec3 forwardVec;
 	void setFootCurve(int i);
 	float speed;
+	bool violatesConstraints(int i, float dist, float angle);
 };
 
