@@ -10,6 +10,10 @@
 #include "svl/SVLgl.h"
 #include "Bezier.h"
 #include "Spider.h"
+#include "ModelManager.h"
+#include <vector>
+
+using namespace std;
 
 void setupScene();
 void updateScene();
@@ -22,7 +26,7 @@ void renderLeg(float orientation, float* position, float timeOffset);
 void drawSpline();
 
 bool *keyStates = new bool[256];
-bool visibleSpline = false;
+bool debug = false;
 char msg[256];
 
 int rotationAngle=0;
@@ -33,12 +37,14 @@ float speed = 5.0f;
 GLUquadric *nQ;
 int mouseX = 400, mouseY = 300;
 
+vector<Entity*> entities;
+
 float radiansToDegrees = 57.2957795f;
 
-Vec3 p1(-2.5, 1.5, -10.0);
-Vec3 p2(0.0, 1.5, -2.5);
-Vec3 p3(5.0, 1.5, 7.0);
-Vec3 p4(2.5, 1.5, 12.5);
+Vec3 p1(0.0, 1.5, 2.5);
+Vec3 p2(0.0, 1.5, 5.0);
+Vec3 p3(0.0, 1.5, 7.5);
+Vec3 p4(0.0, 1.5, 10.0);
 
 struct _position
 {
@@ -112,12 +118,33 @@ void renderScene(){
     glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
+	/*
+
 	glRotatef(pitch, -1.0f, 0.0f, 0.0f);
 	glRotatef(yaw, 0.0f, 1.0f, 0.0f);
 	glTranslatef(-camPosition.x, -camPosition.y, -camPosition.z);
 
-	if (visibleSpline)
+	*/
+	Mat4 camRot;
+	camRot.MakeDiag();
+	camRot *= HRot4(Vec3(-1.0f, 0.0f, 0.0f), pitch * (M_PI / 180.0f));
+	camRot *= HRot4(Vec3(0.0f, -1.0f, 0.0f), yaw * (M_PI / 180.0f));
+
+	Vec3 camPos(0.0f, 3.0f, -9.0f);
+	Vec3 spiderPos = spider->getPos();
+
+	camPos = proj(Vec4(camPos[0], camPos[1], camPos[2], 1.0f) * camRot * HTrans4(spiderPos));	
+	if (camPos[1] < 0.5f)
+		camPos[1] = 0.5f;
+	gluLookAt(camPos[0], camPos[1], camPos[2], spiderPos[0], spiderPos[1] + 3.0f, spiderPos[2], 0.0, 1.0, 0.0);
+
+	if (debug)
 		curve.Draw();
+
+	glPushMatrix();
+	glTranslatef(camPos[0], camPos[1], camPos[2]);
+	//gluSphere(nQ, 0.2f, 5, 5);
+	glPopMatrix();
 
 	glEnable(GL_LIGHTING);
 
@@ -130,7 +157,12 @@ void renderScene(){
 	glLightfv(GL_LIGHT0, GL_POSITION, left_light_position);
 	glLightfv(GL_LIGHT1, GL_POSITION, right_light_position);
 
-	spider->Draw();
+	for (unsigned int i = 0; i < entities.size(); ++i)
+	{
+		entities[i]->Draw();
+		if (debug)
+			entities[i]->DrawDebug();
+	}
 
 	glCallList(wallList);
 	glBegin(GL_QUADS);
@@ -185,8 +217,6 @@ void updateScene(){
 		//spider->Update(time);
 	}
 
-	spider->Update(time);
-
     // Increment angle for next frame
     rotationAngle+=2;
 	time += 0.016f;
@@ -196,6 +226,16 @@ void updateScene(){
     glutPostRedisplay();
 	yaw += (mouseX - 400) / 10.0f;
 	pitch += (300 - mouseY) / 10.0f;
+
+	if (pitch > 85.0f)
+		pitch = 85.0f;
+	else if (pitch < -89.0f)
+		pitch = -89.0f;
+
+	if (yaw > 360.0f)
+		yaw -= 360.0f;
+	else if (yaw < 0)
+		yaw += 360.0f;
 
 	memset(msg, 0, 256);
 	sprintf(msg, "x: %d, y: %d, dy: %d, dy: %d", mouseX, mouseY, mouseX - 400, 300 - mouseY);
@@ -226,13 +266,45 @@ void updateScene(){
 	{
 		camPosition.y -= 0.2f;
 	}
+	if (keyStates['t'] == true)
+	{
+		spider->Advance();
+		spider->SetTargetYaw(yaw);
+	}
+	if (keyStates['g'] == true)
+	{
+		spider->GoBackwards();
+		spider->SetTargetYaw(yaw);
+	}
+	if (keyStates['f'] == true)
+	{
+		spider->GoLeft();
+		spider->SetTargetYaw(yaw);
+	}
+	if (keyStates['h'] == true)
+	{
+		spider->GoRight();
+		spider->SetTargetYaw(yaw);
+	}
+	if (keyStates['r'] == true)
+	{
+		spider->TurnLeft();
+	}
+	if (keyStates['y'] == true)
+	{
+		spider->TurnRight();
+	}
+	for (int i = 0; i < entities.size(); ++i)
+	{
+		entities[i]->Update(time);
+	}
 }
 
 void keyup(unsigned char key, int x, int y)
 {
 	keyStates[key] = false;
 	if (key == 'q')
-		visibleSpline = !visibleSpline;
+		debug = !debug;
 }
 
 void keypress(unsigned char key, int x, int y){
@@ -292,13 +364,21 @@ void setupScene(){
 	glutSetCursor(GLUT_CURSOR_NONE); 
 
 	float junk;	
-	
-	floorModel = glmReadOBJ("floor.obj");
-	floorList = glmList(floorModel, GLM_SMOOTH);
-	wallModel = glmReadOBJ("walls.obj");
-	glmVertexNormals(wallModel, 90, false);
-	wallList = glmList(wallModel, GLM_SMOOTH);
+
+	ModelManager * mm = ModelManager::CurrentInstance();
+
+	mm->Load("floor.obj", "floor", true);
+	floorList = mm->GetList("floor");
+
+	mm->Load("walls.obj", "walls", true);	
+	wallList = mm->GetList("walls");
+
+	mm->Load("skull.obj", "skull", true);
+
+
 	spider = new Spider(&curve);
+
+	entities.push_back(spider);
 
 	//skullTex = glmLoadTexture("skulltex.ppm", true, false, false, true, &junk, &junk);
 	
