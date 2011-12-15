@@ -9,11 +9,15 @@
 #include "Material.h"
 #include "WebShot.h"
 #include "EntityManager.h"
+#include "AttackCollider.h"
 
 Spider::Spider(Vec3 position) : Entity(0)
 {
 	nQ = gluNewQuadric();
 	time = 0.0f;
+
+	score = 0;
+	health = 100;
 	
 	skullList = ModelManager::CurrentInstance()->GetList("skull");
 
@@ -697,7 +701,7 @@ void Spider::Fire(float yaw, float pitch)
 void Spider::Attack()
 {
 	attacking = true;
-	Vec3 forwardVec = proj(Vec4(0.0, 0.0, 1.0, 1.0) * HRot4(Vec3(0.0, 1.0, 0.0), _yaw)) * 2.0f;
+	Vec3 forwardVec = proj(Vec4(0.0, 0.0, 1.0, 1.0) * HRot4(Vec3(0.0, 1.0, 0.0), _yaw / (180.0f / M_PI))) * 2.0f;
 	Vec3 endPoint;
 	float legAngle = ((maxAngle[frontLeft] - minAngle[frontLeft]) / 2.0f) + minAngle[frontLeft];
 	float dist = ((maxDist[frontLeft] - minDist[frontLeft]) / 2.0f) + minDist[frontLeft];
@@ -719,4 +723,7 @@ void Spider::Attack()
 	legSpline[frontRight].SetPoints(footPoint[frontRight], footPoint[frontRight] + Vec3(0.0, 3.0, 0.0) - forwardVec, footPoint[frontRight] + Vec3(0.0, 3.0, 0.0), footPoint[frontRight]);
 	legSplineParam[frontRight] = 0.0f;
 	legMoving[frontRight] = true;
+
+	EntityManager::CurrentInstance()->AddEntity(new AttackCollider(_position + forwardVec, this));
+
 }

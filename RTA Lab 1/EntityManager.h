@@ -16,6 +16,7 @@ public:
 	void AddEntity(Entity* entityToAdd);
 	void RemoveEntity(Entity* entityToRemove);
 	static EntityManager* CurrentInstance();
+	int Count();
 private:
 	static EntityManager* pInstance;
 	vector<Entity*> entities;

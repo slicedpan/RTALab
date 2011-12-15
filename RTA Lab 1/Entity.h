@@ -12,6 +12,7 @@ public:
 	virtual void DrawDebug();
 	virtual BoundingSphere GetCollisionSphere();
 	virtual void Collide(Entity * other);
+	virtual void Die();
 	bool readyToRemove;
 	int EntityType;
 };

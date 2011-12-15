@@ -38,6 +38,8 @@ public:
 	float getYaw();
 	Mat4 getTransform();
 	BoundingSphere GetCollisionSphere();
+	int score;
+	int health;
 
 private:
 	void drawConstraints(float * color, Mat4 transform);

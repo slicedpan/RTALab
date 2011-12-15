@@ -35,4 +35,5 @@ private:
 	void Think();
 	void ChooseNewCurve();
 	void Die();
+	float fallSpeed;
 };

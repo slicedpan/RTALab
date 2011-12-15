@@ -47,10 +47,7 @@ vector<Entity*> entities;
 
 float radiansToDegrees = 57.2957795f;
 
-Vec3 p1(0.0, 1.5, -40.5);
-Vec3 p2(0.0, 30.0, -30.5);
-Vec3 p3(0.0, 30.0, -7.5);
-Vec3 p4(0.0, 15.0, 10.0);
+
 
 struct _position
 {
@@ -71,7 +68,6 @@ GLMmodel * floorModel;
 GLuint floorTex;
 GLuint floorList;
 
-Bezier curve(p1, p2, p3, p4);
 Spider* spider;
 
 bool		wireframe=false;
@@ -208,6 +204,33 @@ void moveRight(float amount)
 	camPosition.x += sinf((-yaw + 90.0f) / radiansToDegrees) * amount;
 }
 
+void AddFly()
+{	
+	Vec3 p[4];
+	p[0] = Vec3(0.0, 1.5, -40.5);
+	p[1] = Vec3(0.0, 30.0, -30.5);
+	p[2] = Vec3(0.0, 30.0, -7.5);
+	p[3] = Vec3(0.0, 15.0, 10.0);
+
+	float angle = (rand() / (float)RAND_MAX) * 2 * M_PI;
+
+	Mat4 rotMat = HRot4(Vec3(0.0, 1.0, 0.0), angle);
+
+	for (int i = 0; i < 4; ++i)
+	{
+		p[i] = proj(Vec4(p[i], 1.0) * rotMat);
+	}
+
+	Bezier* bezier = new Bezier(p[0], p[1], p[2], p[3]);
+	Fly* fly = new Fly(bezier);
+	EntityManager::CurrentInstance()->AddEntity(fly);
+}
+
+void AddWasp()
+{
+
+}
+
 void updateScene(){
 	
 	// Wait until at least 16ms passed since start of last frame
@@ -215,9 +238,12 @@ void updateScene(){
 	while(timeGetTime()-lastTickCount<16);
 	lastTickCount=timeGetTime();
     
-	if (keyStates['p'] == true)
+	if (rand() % 500 < 2 && em->Count() < 25)
 	{
-		//spider->Update(time);
+		if (rand() % 2 == 0)
+			AddFly();
+		else
+			AddWasp();
 	}
 
     // Increment angle for next frame
@@ -373,7 +399,7 @@ void setupScene(){
 
 	entities.push_back(spider);
 	em->AddEntity(spider);
-	em->AddEntity(new Fly(&curve));
+	AddFly();
 
 	//skullTex = glmLoadTexture("skulltex.ppm", true, false, false, true, &junk, &junk);
 	

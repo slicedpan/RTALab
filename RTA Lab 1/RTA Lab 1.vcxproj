@@ -79,6 +79,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AABB.h" />
+    <ClInclude Include="AttackCollider.h" />
     <ClInclude Include="Bezier.h" />
     <ClInclude Include="BoundingSphere.h" />
     <ClInclude Include="Curve.h" />
@@ -98,6 +99,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AABB.cpp" />
+    <ClCompile Include="AttackCollider.cpp" />
     <ClCompile Include="Bezier.cpp" />
     <ClCompile Include="BoundingSphere.cpp" />
     <ClCompile Include="Entity.cpp" />

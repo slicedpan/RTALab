@@ -22,6 +22,11 @@ void Entity::DrawDebug()
 
 }
 
+void Entity::Die()
+{
+
+}
+
 void Entity::Update(float ticks)
 {
 

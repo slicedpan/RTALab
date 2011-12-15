@@ -19,6 +19,11 @@ EntityManager* EntityManager::CurrentInstance()
 	return pInstance;
 }
 
+int EntityManager::Count()
+{
+	return entities.size();
+}
+
 void EntityManager::Draw()
 {
 	for (int i = 0; i < entities.size(); ++i)

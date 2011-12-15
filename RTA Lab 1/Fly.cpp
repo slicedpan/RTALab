@@ -20,6 +20,7 @@ Fly::Fly(Curve * pCurve) : Entity(1)
 	curve = pCurve;
 	_position = curve->Position(0.0f);	
 	falling = false;
+	fallSpeed = 0.0f;
 }
 
 void Fly::Collide(Entity* other)
@@ -36,7 +37,7 @@ void Fly::Collide(Entity* other)
 
 void Fly::Die()
 {
-	//readyToRemove = true;
+	readyToRemove = true;
 }
 
 Fly::~Fly(void)
@@ -83,6 +84,8 @@ void Fly::Draw()
 
 void Fly::DrawWing(GLuint tex, bool reverse)
 {
+	if (falling)
+		return;
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glEnable(GL_NORMALIZE);
@@ -134,6 +137,14 @@ void Fly::Update(float ticks)
 	_transform *= HRot4(Vec3(1.0f, 0.0f, 0.0f), _pitch);
 	_transform *= HRot4(Vec3(0.0f, 1.0f, 0.0f), _yaw);
 	_transform *= HTrans4(_position);
+	if (falling)
+	{
+		_position[1] -= fallSpeed;
+		fallSpeed += 0.05f;
+		if (_position[1] - GetCollisionSphere().Radius < 0)
+			_position[1] = GetCollisionSphere().Radius;
+		return;
+	}
 	if (onCurve && curve != 0)
 	{
 		factor += 0.003f;
