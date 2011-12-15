@@ -18,7 +18,7 @@ BoundingSphere::~BoundingSphere(void)
 bool BoundingSphere::Intersects(BoundingSphere& other)
 {
 	float dist = len(other.Position - Position);
-	if (dist < (other.Radius + Radius))
+	if (dist <= (other.Radius + Radius))
 		return true;
 	return false;
 }

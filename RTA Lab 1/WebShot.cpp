@@ -35,11 +35,13 @@ void WebShot::DrawDebug()
 void WebShot::Update(float ticks)
 {
 	_position += _velocity;
+	if (len(_position) > 100.0f)
+		readyToRemove = true;
 }
 
 void WebShot::Collide(Entity* other)
 {
-
+	readyToRemove = true;
 }
 
 BoundingSphere WebShot::GetCollisionSphere()

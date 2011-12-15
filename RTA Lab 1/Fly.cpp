@@ -166,7 +166,7 @@ void Fly::ChooseNewCurve()
 	p2 += p1;
 	float endHeight = (rand() % 10000) / 10000.0f;
 	endHeight *= 5.0f;
-	endHeight += 5.0f;
+	endHeight += 1.0f;
 	p3[0] = (rand() % 10000 / 10000.0f) * 40.0f - 20.0f;
 	p3[1] = endHeight;
 	p3[2] = (rand() % 10000 / 10000.0f) * 40.0f - 20.0f;

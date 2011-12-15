@@ -19,5 +19,7 @@ public:
 private:
 	static EntityManager* pInstance;
 	vector<Entity*> entities;
+	void CullEntities();
+	vector<Entity*> entitiesToRemove;
 };
 

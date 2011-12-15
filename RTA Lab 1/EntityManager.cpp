@@ -40,6 +40,8 @@ void EntityManager::Update(float ticks)
 	for (int i = 0; i < entities.size(); ++i)
 	{
 		entities[i]->Update(ticks);
+		if  (entities[i]->readyToRemove)
+			entitiesToRemove.push_back(entities[i]);
 	}
 	for (int i = 0; i < entities.size(); ++i)
 	{
@@ -52,6 +54,7 @@ void EntityManager::Update(float ticks)
 			}
 		}
 	}
+	CullEntities();
 }
 
 void EntityManager::AddEntity(Entity* entityToAdd)
@@ -61,5 +64,22 @@ void EntityManager::AddEntity(Entity* entityToAdd)
 
 void EntityManager::RemoveEntity(Entity* entityToRemove)
 {
-	for (int i = 0;
+	entitiesToRemove.push_back(entityToRemove);
+}
+
+void EntityManager::CullEntities()
+{
+	int index = -1;
+	for (int j = 0; j < entitiesToRemove.size(); ++j)
+	{
+		Entity* entityToRemove = entities[j];
+		for (int i = 0; i < entities.size(); ++i)
+		{
+			if (entities[i] == entityToRemove)
+				index = i;
+		}
+		if (index >= 0)
+			entities.erase(entities.begin() + index);
+	}
+	entitiesToRemove.clear();
 }
