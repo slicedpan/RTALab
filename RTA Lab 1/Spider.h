@@ -79,5 +79,7 @@ private:
 	float maxTurningSpeed;
 	Mat4 endTransform;
 	float targetYaw;
+	bool attacking;
+	float attackCounter;
 };
 

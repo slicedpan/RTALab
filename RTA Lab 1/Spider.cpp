@@ -19,6 +19,9 @@ Spider::Spider(Vec3 position) : Entity(0)
 
 	_position = position;
 
+	attacking = false;
+	attackCounter = 0.0f;
+
 	velocity.MakeZero();
 
 	lowerLegLength = 2.3f;
@@ -269,7 +272,17 @@ void Spider::Update(float ticks)
 	}	
 
 	velocity[1] = 0.0f;
-	_position += velocity;
+	if (!attacking)
+		_position += velocity;
+	else
+	{
+		attackCounter += 0.05f;
+		if (attackCounter > 1.0f)
+		{
+			attacking = false;
+			attackCounter = 0.0f;
+		}
+	}
 	velocity *= 0.7f;
 
 	if (targetYaw - _yaw > 180.0f)
@@ -336,12 +349,6 @@ void Spider::Draw()
 	*/
 	glMultMatrixf(_transform.Ref());
 	glPushMatrix(); //legs
-
-	for (int i = 0; i < 8; ++i)
-	{
-		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, colors[i]);
-		//renderLeg(angle[i], pos[i], phase[i]);	
-	}
 	
 	glPushMatrix(); //body
 	glTranslatef(0.0f, 0.0f, 0.5f);
@@ -378,7 +385,7 @@ void Spider::DrawDebug()
 	{
 		if (legMoving[i])
 		{
-			//legSpline[i].Draw();			
+			legSpline[i].Draw();			
 		}
 	}
 	drawConstraints();
@@ -682,7 +689,6 @@ void Spider::Fire(float yaw, float pitch)
 
 	wsVel = proj(Vec4(0.0, 0.0, 1.0, 1.0) * transform);
 	wsPos = _position + wsVel * 2.5f;
-	wsVel *= 10.0f;
 
 	webShot = new WebShot(wsPos, wsVel);
 	EntityManager::CurrentInstance()->AddEntity(webShot);
@@ -690,5 +696,27 @@ void Spider::Fire(float yaw, float pitch)
 
 void Spider::Attack()
 {
+	attacking = true;
+	Vec3 forwardVec = proj(Vec4(0.0, 0.0, 1.0, 1.0) * HRot4(Vec3(0.0, 1.0, 0.0), _yaw)) * 2.0f;
+	Vec3 endPoint;
+	float legAngle = ((maxAngle[frontLeft] - minAngle[frontLeft]) / 2.0f) + minAngle[frontLeft];
+	float dist = ((maxDist[frontLeft] - minDist[frontLeft]) / 2.0f) + minDist[frontLeft];
+	endPoint[0] = cosf((legAngle) / (180.0f / M_PI)) * dist + pos[frontLeft][0];
+	endPoint[1] = 0.1f;	
+	endPoint[2] = sinf((legAngle) / (180.0f / M_PI)) * dist + pos[frontLeft][2];
+	endPoint = proj(Vec4(endPoint[0], endPoint[1], endPoint[2], 1.0f) * _transform);
+	endPoint[1] = 0.0f;
+	legSpline[frontLeft].SetPoints(footPoint[frontLeft], footPoint[frontLeft] + Vec3(0.0, 3.0, 0.0) - forwardVec, footPoint[frontLeft] + Vec3(0.0, 3.0, 0.0), endPoint);
+	legSplineParam[frontLeft] = 0.0f;
+	legMoving[frontLeft] = true;
 
+	legAngle = ((maxAngle[frontRight] - minAngle[frontRight]) / 2.0f) + minAngle[frontRight];
+	endPoint[0] = cosf((legAngle) / (180.0f / M_PI)) * dist + pos[frontRight][0];
+	endPoint[1] = 0.1f;	
+	endPoint[2] = sinf((legAngle) / (180.0f / M_PI)) * dist + pos[frontRight][2];
+	endPoint = proj(Vec4(endPoint[0], endPoint[1], endPoint[2], 1.0f) * _transform);
+	endPoint[1] = 0.0f;
+	legSpline[frontRight].SetPoints(footPoint[frontRight], footPoint[frontRight] + Vec3(0.0, 3.0, 0.0) - forwardVec, footPoint[frontRight] + Vec3(0.0, 3.0, 0.0), footPoint[frontRight]);
+	legSplineParam[frontRight] = 0.0f;
+	legMoving[frontRight] = true;
 }

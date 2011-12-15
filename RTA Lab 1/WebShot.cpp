@@ -18,9 +18,24 @@ void WebShot::Draw()
 	pitch = atan2f(_velocity[1], linearDist);
 	yaw = atan2f(_velocity[0], _velocity[2]);
 	glPushMatrix();
-	glRotatef(pitch, 1.0f, 0.0f, 0.0f);
-	glRotatef(pitch, 0.0f, 1.0f, 0.0f);
 	glTranslatef(_position[0], _position[1], _position[2]);
+	glRotatef(pitch * (180.0f / 3.1415f), 1.0f, 0.0f, 0.0f);
+	glRotatef(yaw * (180.0f / 3.1415f), 0.0f, 1.0f, 0.0f);	
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_BLEND);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glBegin(GL_QUADS);
+	glVertex3f(-0.5f, 0.5f, 0.0f);
+	glTexCoord2f(0.0f, 0.0f);
+	glVertex3f(0.5f, 0.5f, 0.0f);
+	glTexCoord2f(1.0f, 0.0f);
+	glVertex3f(0.5f, -0.5f, 0.0f);
+	glTexCoord2f(1.0f, 1.0f);
+	glVertex3f(-0.5f, -0.5f, 0.0f);
+	glTexCoord2f(0.0f, 1.0f);
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_BLEND);
 	glPopMatrix();
 }
 
@@ -36,7 +51,9 @@ void WebShot::Update(float ticks)
 {
 	_position += _velocity;
 	if (len(_position) > 100.0f)
+	{
 		readyToRemove = true;
+	}
 }
 
 void WebShot::Collide(Entity* other)

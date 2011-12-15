@@ -36,7 +36,7 @@ void Fly::Collide(Entity* other)
 
 void Fly::Die()
 {
-	readyToRemove = true;
+	//readyToRemove = true;
 }
 
 Fly::~Fly(void)

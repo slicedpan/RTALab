@@ -13,6 +13,7 @@
 #include "ModelManager.h"
 #include "TextureManager.h"
 #include "EntityManager.h"
+#include "Material.h"
 #include "Fly.h"
 #include <vector>
 
@@ -138,15 +139,20 @@ void renderScene(){
 	Vec3 camPos(0.0f, 3.0f, -9.0f);
 	Vec3 spiderPos = spider->getPos();
 
+	glLightfv(GL_LIGHT0, GL_POSITION, left_light_position);
+	glLightfv(GL_LIGHT1, GL_POSITION, right_light_position);	
+
 	camPos = proj(Vec4(camPos[0], camPos[1], camPos[2], 1.0f) * camRot * HTrans4(spiderPos));	
 	if (camPos[1] < 0.5f)
 		camPos[1] = 0.5f;
 	gluLookAt(camPos[0], camPos[1], camPos[2], spiderPos[0], spiderPos[1] + 3.0f, spiderPos[2], 0.0, 1.0, 0.0);	
 
+	/*
 	glPushMatrix();
 	glTranslatef(camPos[0], camPos[1], camPos[2]);
 	//gluSphere(nQ, 0.2f, 5, 5);
 	glPopMatrix();
+	*/
 
 	glEnable(GL_LIGHTING);
 
@@ -154,12 +160,10 @@ void renderScene(){
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, grey_ambient);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, grey_diffuse);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, grey_specular);
-	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, grey_shininess); 
-
-	glLightfv(GL_LIGHT0, GL_POSITION, left_light_position);
-	glLightfv(GL_LIGHT1, GL_POSITION, right_light_position);	
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, grey_shininess); 	
 
 	glCallList(wallList);
+	Material::DebugMaterial()->SetMaterial();
 	glBegin(GL_QUADS);
 	glVertex3f(25.0f, 0.0f, 25.0f);
 	glVertex3f(-25.0f, 0.0f, 25.0f);	
@@ -416,6 +420,10 @@ void MouseClick(int button, int state, int x, int y)
 	if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
 	{
 		spider->Fire(yaw, pitch);
+	}
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+	{
+		spider->Attack();
 	}
 }
 

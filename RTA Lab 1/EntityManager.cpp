@@ -69,10 +69,11 @@ void EntityManager::RemoveEntity(Entity* entityToRemove)
 
 void EntityManager::CullEntities()
 {
-	int index = -1;
+	int index;
 	for (int j = 0; j < entitiesToRemove.size(); ++j)
 	{
-		Entity* entityToRemove = entities[j];
+		index = -1;
+		Entity* entityToRemove = entitiesToRemove[j];
 		for (int i = 0; i < entities.size(); ++i)
 		{
 			if (entities[i] == entityToRemove)
