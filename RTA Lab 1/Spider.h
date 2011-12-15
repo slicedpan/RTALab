@@ -23,6 +23,7 @@ public:
 	void SetTargetYaw(float yaw);
 	void Fire(float yaw, float pitch);
 	void Attack();
+	void Collide(Entity* other);
 	static const int frontLeft = 0;
 	static const int frontRight = 1;
 	static const int secondLeft = 2;
@@ -40,8 +41,9 @@ public:
 	BoundingSphere GetCollisionSphere();
 	int score;
 	int health;
-
+	static Spider* CurrentInstance();
 private:
+	static Spider* pInstance;
 	void drawConstraints(float * color, Mat4 transform);
 	void drawConstraints();
 	void moveLegTo(int leg, Vec3 position, float curveHeight, float curveSpeed);
@@ -83,5 +85,11 @@ private:
 	float targetYaw;
 	bool attacking;
 	float attackCounter;
+	bool inPain;
+	bool fired;
+	int fireCounter;
+	int painCounter;
+	Material bodyMaterial;
+	Material legMaterial;
 };
 

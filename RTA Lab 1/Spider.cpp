@@ -11,10 +11,19 @@
 #include "EntityManager.h"
 #include "AttackCollider.h"
 
+Spider* Spider::pInstance;
+
 Spider::Spider(Vec3 position) : Entity(0)
 {
+	pInstance = this;
+
+	fired = false;
+	fireCounter = 0;
+
 	nQ = gluNewQuadric();
 	time = 0.0f;
+
+	inPain = false;
 
 	score = 0;
 	health = 100;
@@ -184,6 +193,23 @@ Spider::Spider(Vec3 position) : Entity(0)
 
 #pragma endregion
 
+#pragma region materials
+
+	bodyMaterial.Diffuse[0] = 0.2f;
+	bodyMaterial.Diffuse[1] = 0.2f;
+	bodyMaterial.Diffuse[2] = 0.2f;
+
+	legMaterial.Diffuse[0] = 0.7f;
+	legMaterial.Diffuse[1] = 0.7f;
+	legMaterial.Diffuse[2] = 0.7f;
+
+#pragma endregion
+
+}
+
+Spider* Spider::CurrentInstance()
+{
+	return pInstance;
 }
 
 BoundingSphere Spider::GetCollisionSphere()
@@ -320,6 +346,10 @@ void Spider::Update(float ticks)
 	_lastPosition = _position;
 	_lastYaw = _yaw;
 	
+	++fireCounter;
+	if (fireCounter >= 45)
+		fired = false;
+
 }
 
 void Spider::SetTargetYaw(float yaw)
@@ -686,9 +716,11 @@ void Spider::setFootCurve(int i)
 
 void Spider::Fire(float yaw, float pitch)
 {
+	if (fired)
+		return;
 	Vec3 wsPos, wsVel;	
 	Mat4 transform = HRot4(Vec3(1.0, 0.0, 0.0), -pitch / (180.0f / M_PI));
-	transform *= HRot4(Vec3(0.0, 1.0, 0.0), -yaw / (180.0f / M_PI));
+	transform *= HRot4(Vec3(0.0, 1.0, 0.0), _yaw / (180.0f / M_PI));
 	WebShot* webShot;
 
 	wsVel = proj(Vec4(0.0, 0.0, 1.0, 1.0) * transform);
@@ -696,6 +728,8 @@ void Spider::Fire(float yaw, float pitch)
 
 	webShot = new WebShot(wsPos, wsVel);
 	EntityManager::CurrentInstance()->AddEntity(webShot);
+	fired = true;
+	fireCounter = 0;
 }
 
 void Spider::Attack()
@@ -726,4 +760,14 @@ void Spider::Attack()
 
 	EntityManager::CurrentInstance()->AddEntity(new AttackCollider(_position + forwardVec, this));
 
+}
+
+void Spider::Collide(Entity* other)
+{
+	if (other->EntityType == 5 && !inPain)
+	{
+		health -= 10;
+		inPain = true;
+		painCounter = 0;
+	}
 }

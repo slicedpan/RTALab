@@ -95,6 +95,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="Utils.h" />
+    <ClInclude Include="Wasp.h" />
     <ClInclude Include="WebShot.h" />
   </ItemGroup>
   <ItemGroup>
@@ -120,6 +121,7 @@
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="Utils.cpp" />
+    <ClCompile Include="Wasp.cpp" />
     <ClCompile Include="WebShot.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

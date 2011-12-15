@@ -5,11 +5,11 @@
 #include "Curve.h"
 #include "Material.h"
 
-class Fly : public Entity
+class Wasp : public Entity
 {
 public:
-	Fly(Curve* pCurve);
-	~Fly(void);
+	Wasp(Curve* pCurve);
+	~Wasp(void);
 	void Update(float ticks);
 	void Draw();
 	void DrawDebug();
@@ -37,7 +37,11 @@ private:
 	void ChooseNewCurve();
 	void Die();
 	float fallSpeed;
+	Material eyeMaterial;
 	Material bodyMaterial;
 	Material wingMaterial;
-	Material eyeMaterial;
+	void Attack();
+	void Retreat();
+	bool attacking;
+	Vec3 originalPos;
 };

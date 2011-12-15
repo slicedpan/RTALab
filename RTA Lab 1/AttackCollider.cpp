@@ -29,7 +29,7 @@ void AttackCollider::Collide(Entity* other)
 		if (_owner->health > 100)
 			_owner->health = 100;
 	}
-	else if (other->EntityType == 5)
+	else if (other->EntityType == 5 || other->EntityType == 6)
 	{
 		other->Die();
 		_owner->score += 10;

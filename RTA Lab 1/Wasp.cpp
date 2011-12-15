@@ -1,9 +1,10 @@
-#include "Fly.h"
+#include "Wasp.h"
 #include "TextureManager.h"
 #include "Material.h"
 #include "Bezier.h"
+#include "Spider.h"
 
-Fly::Fly(Curve * pCurve) : Entity(1)
+Wasp::Wasp(Curve * pCurve) : Entity(5)
 {
 	wingTex = TextureManager::GetCurrentInstance()->GetTexture("flywing");
 	wingTex50 = TextureManager::GetCurrentInstance()->GetTexture("flywing50");
@@ -21,9 +22,7 @@ Fly::Fly(Curve * pCurve) : Entity(1)
 	_position = curve->Position(0.0f);	
 	falling = false;
 	fallSpeed = 0.0f;
-	bodyMaterial.Diffuse[0] = 0.0f;
-	bodyMaterial.Diffuse[1] = 0.0f;
-	bodyMaterial.Diffuse[2] = 0.05f;
+	attacking = false;
 
 	eyeMaterial.Diffuse[0] = 1.0f;
 	eyeMaterial.Diffuse[1] = 1.0f;
@@ -32,14 +31,14 @@ Fly::Fly(Curve * pCurve) : Entity(1)
 	wingMaterial.Diffuse[0] = 0.7f;
 	wingMaterial.Diffuse[1] = 0.7f;
 	wingMaterial.Diffuse[2] = 0.7f;
-
 }
 
-void Fly::Collide(Entity* other)
+void Wasp::Collide(Entity* other)
 {
 	if (other->EntityType == 2)
 	{
 		falling = true;
+		EntityType = 6;
 	}
 	else if (other->EntityType == 3)
 	{
@@ -47,16 +46,16 @@ void Fly::Collide(Entity* other)
 	}
 }
 
-void Fly::Die()
+void Wasp::Die()
 {
 	readyToRemove = true;
 }
 
-Fly::~Fly(void)
+Wasp::~Wasp(void)
 {
 }
 
-void Fly::Draw()
+void Wasp::Draw()
 {
 	glPushMatrix(); 
 	glMultMatrixf(_transform.Ref()); //Fly's object space
@@ -97,7 +96,7 @@ void Fly::Draw()
 	glPopMatrix();
 }
 
-void Fly::DrawWing(GLuint tex, bool reverse)
+void Wasp::DrawWing(GLuint tex, bool reverse)
 {
 	if (falling)
 		return;
@@ -132,7 +131,7 @@ void Fly::DrawWing(GLuint tex, bool reverse)
 	
 }
 
-void Fly::DrawDebug()
+void Wasp::DrawDebug()
 {
 	glPushMatrix();
 	Material::DebugMaterial()->SetMaterial();
@@ -145,7 +144,7 @@ void Fly::DrawDebug()
 		curve->Draw();
 }
 
-void Fly::Update(float ticks)
+void Wasp::Update(float ticks)
 {
 	wingAngle = sinf(ticks * 50.0f) * 10.0f;
 	_transform.MakeDiag();
@@ -176,13 +175,57 @@ void Fly::Update(float ticks)
 	}
 	else
 	{
-		ChooseNewCurve();
-		factor = 0.0f;
-		onCurve = true;
+		if (attacking)
+		{
+			attacking = false;
+			Retreat();
+			factor = 0.0f;
+			onCurve = true;
+			return;
+		}
+		if (rand() % 2 == 0)
+		{
+			ChooseNewCurve();
+			factor = 0.0f;
+			onCurve = true;
+		}
+		else
+		{
+			Attack();
+			onCurve= true;
+			factor = 0.0f;
+			attacking = true;
+		}
 	}
 }
 
-void Fly::ChooseNewCurve()
+void Wasp::Attack()
+{
+	Vec3 p1, p2, p3, p4;
+	p1 = _position;
+	p2 = _nextPosition - _position;
+	p2.Normalise();
+	p2 *= 5.0f;
+	p2 += p1;	
+	p4 = Spider::CurrentInstance()->getPos();
+	p4 -= (p2 - p1).Normalise() * 3.0f;
+	p3 = p4 + p2;
+	p3 /= 2.0f;
+	curve = new Bezier(p1, p2, p3, p4);
+	originalPos = _position;
+}
+
+void Wasp::Retreat()
+{
+	Vec3 p1, p2, p3, p4;
+	p1 = _position;
+	p2 = _position + ((originalPos - _position) * 0.33333f) + Vec3(0.0, 5.0, 0.0);
+	p3 = _position + ((originalPos - _position) * 0.66666f) + Vec3(0.0, 2.5, 0.0);
+	p4 = originalPos;
+	curve = new Bezier(p1, p2, p3, p4);
+}
+
+void Wasp::ChooseNewCurve()
 {
 	Vec3 p1, p2, p3, p4;
 	p1 = _position;
@@ -209,12 +252,12 @@ void Fly::ChooseNewCurve()
 
 }
 
-void Fly::Think()
+void Wasp::Think()
 {
 
 }
 
-BoundingSphere Fly::GetCollisionSphere()
+BoundingSphere Wasp::GetCollisionSphere()
 {
 	BoundingSphere sphere;
 	sphere.Position = _position;

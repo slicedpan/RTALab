@@ -15,6 +15,7 @@
 #include "EntityManager.h"
 #include "Material.h"
 #include "Fly.h"
+#include "Wasp.h"
 #include <vector>
 
 using namespace std;
@@ -228,7 +229,24 @@ void AddFly()
 
 void AddWasp()
 {
+	Vec3 p[4];
+	p[0] = Vec3(0.0, 1.5, -40.5);
+	p[1] = Vec3(0.0, 30.0, -30.5);
+	p[2] = Vec3(0.0, 30.0, -7.5);
+	p[3] = Vec3(0.0, 15.0, 10.0);
 
+	float angle = (rand() / (float)RAND_MAX) * 2 * M_PI;
+
+	Mat4 rotMat = HRot4(Vec3(0.0, 1.0, 0.0), angle);
+
+	for (int i = 0; i < 4; ++i)
+	{
+		p[i] = proj(Vec4(p[i], 1.0) * rotMat);
+	}
+
+	Bezier* bezier = new Bezier(p[0], p[1], p[2], p[3]);
+	Wasp* wasp = new Wasp(bezier);
+	EntityManager::CurrentInstance()->AddEntity(wasp);
 }
 
 void updateScene(){
