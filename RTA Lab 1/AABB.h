@@ -6,17 +6,18 @@ struct extent
 {
 	float point; 
 	float length;
-	bool Intersects(const extent& other);
-}
+	bool Intersects(extent& other);
+};
 
 class AABB
 {
 public:
+	AABB(Vec3 position, float width, float height, float depth);
 	void SetPosition(Vec3 position);
 	void SetHeight(float height);
 	void SetWidth(float width);
 	void SetDepth(float depth);
-	bool Intersects(const AABB& other);
+	bool Intersects(AABB& other);
 	extent GetExtent(int i);
 private:
 	extent extents[3];	

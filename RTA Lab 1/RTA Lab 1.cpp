@@ -11,6 +11,9 @@
 #include "Bezier.h"
 #include "Spider.h"
 #include "ModelManager.h"
+#include "TextureManager.h"
+#include "EntityManager.h"
+#include "Fly.h"
 #include <vector>
 
 using namespace std;
@@ -29,6 +32,8 @@ bool *keyStates = new bool[256];
 bool debug = false;
 char msg[256];
 
+EntityManager* em;
+
 int rotationAngle=0;
 float time = 0.0f;
 float yaw = 0.0f;
@@ -41,10 +46,10 @@ vector<Entity*> entities;
 
 float radiansToDegrees = 57.2957795f;
 
-Vec3 p1(0.0, 1.5, 2.5);
-Vec3 p2(0.0, 1.5, 5.0);
-Vec3 p3(0.0, 1.5, 7.5);
-Vec3 p4(0.0, 1.5, 10.0);
+Vec3 p1(0.0, 1.5, -40.5);
+Vec3 p2(0.0, 30.0, -30.5);
+Vec3 p3(0.0, 30.0, -7.5);
+Vec3 p4(0.0, 15.0, 10.0);
 
 struct _position
 {
@@ -136,10 +141,7 @@ void renderScene(){
 	camPos = proj(Vec4(camPos[0], camPos[1], camPos[2], 1.0f) * camRot * HTrans4(spiderPos));	
 	if (camPos[1] < 0.5f)
 		camPos[1] = 0.5f;
-	gluLookAt(camPos[0], camPos[1], camPos[2], spiderPos[0], spiderPos[1] + 3.0f, spiderPos[2], 0.0, 1.0, 0.0);
-
-	if (debug)
-		curve.Draw();
+	gluLookAt(camPos[0], camPos[1], camPos[2], spiderPos[0], spiderPos[1] + 3.0f, spiderPos[2], 0.0, 1.0, 0.0);	
 
 	glPushMatrix();
 	glTranslatef(camPos[0], camPos[1], camPos[2]);
@@ -155,14 +157,7 @@ void renderScene(){
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, grey_shininess); 
 
 	glLightfv(GL_LIGHT0, GL_POSITION, left_light_position);
-	glLightfv(GL_LIGHT1, GL_POSITION, right_light_position);
-
-	for (unsigned int i = 0; i < entities.size(); ++i)
-	{
-		entities[i]->Draw();
-		if (debug)
-			entities[i]->DrawDebug();
-	}
+	glLightfv(GL_LIGHT1, GL_POSITION, right_light_position);	
 
 	glCallList(wallList);
 	glBegin(GL_QUADS);
@@ -172,6 +167,10 @@ void renderScene(){
 	glVertex3f(25.0f, 0.0f, -25.0f);	
 	glEnd();
 	//glCallList(floorList);	
+
+	em->Draw();
+	if (debug)
+		em->DrawDebug();
 
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_LIGHTING);
@@ -242,22 +241,6 @@ void updateScene(){
 
 	glutWarpPointer(400, 300);
 
-	if (keyStates['w'] == true)
-	{
-		moveForward(0.2f);
-	}
-	if (keyStates['s'] == true)
-	{
-		moveForward(-0.2f);
-	}
-	if (keyStates['a'] == true)
-	{
-		moveRight(-0.2f);
-	}
-	if (keyStates['d'] == true)
-	{
-		moveRight(0.2f);
-	}
 	if (keyStates[' '] == true)
 	{
 		camPosition.y += 0.2f;
@@ -266,22 +249,22 @@ void updateScene(){
 	{
 		camPosition.y -= 0.2f;
 	}
-	if (keyStates['t'] == true)
+	if (keyStates['w'] == true)
 	{
 		spider->Advance();
 		spider->SetTargetYaw(yaw);
 	}
-	if (keyStates['g'] == true)
+	if (keyStates['s'] == true)
 	{
 		spider->GoBackwards();
 		spider->SetTargetYaw(yaw);
 	}
-	if (keyStates['f'] == true)
+	if (keyStates['a'] == true)
 	{
 		spider->GoLeft();
 		spider->SetTargetYaw(yaw);
 	}
-	if (keyStates['h'] == true)
+	if (keyStates['d'] == true)
 	{
 		spider->GoRight();
 		spider->SetTargetYaw(yaw);
@@ -294,10 +277,7 @@ void updateScene(){
 	{
 		spider->TurnRight();
 	}
-	for (int i = 0; i < entities.size(); ++i)
-	{
-		entities[i]->Update(time);
-	}
+	em->Update(time);
 }
 
 void keyup(unsigned char key, int x, int y)
@@ -338,6 +318,8 @@ void setupScene(){
 	float quadAtten = 0.001f;
 	float linearAtten = 0.001f;
 
+	srand(255);
+
 	glLightfv(GL_LIGHT0, GL_POSITION, left_light_position);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, white_light);
 	glLightfv(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, &quadAtten);
@@ -367,18 +349,27 @@ void setupScene(){
 
 	ModelManager * mm = ModelManager::CurrentInstance();
 
-	mm->Load("floor.obj", "floor", true);
+	//mm->Load("floor.obj", "floor", true);
 	floorList = mm->GetList("floor");
 
 	mm->Load("walls.obj", "walls", true);	
 	wallList = mm->GetList("walls");
 
-	mm->Load("skull.obj", "skull", true);
+	//mm->Load("skull.obj", "skull", true);
 
+	TextureManager * tm = TextureManager::GetCurrentInstance();
+	tm->Load("flywing.png", "flywing", 350, 244);
+	tm->Load("flywing50.png", "flywing50", 350, 244);
+	tm->Load("flywing100.png", "flywing100",350, 244);
+	tm->Load("web.png", "web", 199, 200);
 
-	spider = new Spider(&curve);
+	em = EntityManager::CurrentInstance();
+
+	spider = new Spider(Vec3(0.0f, 0.6f, 0.0f));
 
 	entities.push_back(spider);
+	em->AddEntity(spider);
+	em->AddEntity(new Fly(&curve));
 
 	//skullTex = glmLoadTexture("skulltex.ppm", true, false, false, true, &junk, &junk);
 	
@@ -420,6 +411,14 @@ void setViewport(int width, int height) {
 
 }
 
+void MouseClick(int button, int state, int x, int y)
+{
+	if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
+	{
+		spider->Fire(yaw, pitch);
+	}
+}
+
 int main(int argc, char *argv[]){
         
     // Initialise OpenGL
@@ -437,7 +436,8 @@ int main(int argc, char *argv[]){
     glutKeyboardFunc(keypress);
 	glutKeyboardUpFunc(keyup);
 	glutPassiveMotionFunc(mouseMove);
-	glutMotionFunc(mouseMove);	
+	glutMotionFunc(mouseMove);
+	glutMouseFunc(MouseClick);
 
     // Setup OpenGL state & scene resources (models, textures etc)
     setupScene();
@@ -448,3 +448,5 @@ int main(int argc, char *argv[]){
     return 0;
     
 }
+
+

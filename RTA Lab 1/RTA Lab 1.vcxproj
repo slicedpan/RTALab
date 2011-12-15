@@ -80,19 +80,29 @@
   <ItemGroup>
     <ClInclude Include="AABB.h" />
     <ClInclude Include="Bezier.h" />
+    <ClInclude Include="BoundingSphere.h" />
     <ClInclude Include="Curve.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="EntityManager.h" />
+    <ClInclude Include="Fly.h" />
     <ClInclude Include="glm\glm.h" />
     <ClInclude Include="glm\glmint.h" />
+    <ClInclude Include="Material.h" />
     <ClInclude Include="ModelManager.h" />
     <ClInclude Include="Spider.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="TextureManager.h" />
+    <ClInclude Include="Utils.h" />
+    <ClInclude Include="WebShot.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AABB.cpp" />
     <ClCompile Include="Bezier.cpp" />
+    <ClCompile Include="BoundingSphere.cpp" />
     <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="EntityManager.cpp" />
+    <ClCompile Include="Fly.cpp" />
     <ClCompile Include="glm\glm.c" />
     <ClCompile Include="glm\glmimg.c" />
     <ClCompile Include="glm\glmimg_devil.c" />
@@ -101,10 +111,14 @@
     <ClCompile Include="glm\glmimg_sdl.c" />
     <ClCompile Include="glm\glmimg_sim.c" />
     <ClCompile Include="glm\glm_util.c" />
+    <ClCompile Include="Material.cpp" />
     <ClCompile Include="ModelManager.cpp" />
     <ClCompile Include="RTA Lab 1.cpp" />
     <ClCompile Include="Spider.cpp" />
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="TextureManager.cpp" />
+    <ClCompile Include="Utils.cpp" />
+    <ClCompile Include="WebShot.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

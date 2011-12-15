@@ -5,15 +5,19 @@
 #include "glm\glm.h"
 #include "Bezier.h"
 #include "ModelManager.h"
+#include "TextureManager.h"
+#include "Material.h"
+#include "WebShot.h"
+#include "EntityManager.h"
 
-Spider::Spider(Curve* curveToFollow)
+Spider::Spider(Vec3 position) : Entity(0)
 {
 	nQ = gluNewQuadric();
 	time = 0.0f;
 	
 	skullList = ModelManager::CurrentInstance()->GetList("skull");
 
-	_curve = curveToFollow;
+	_position = position;
 
 	velocity.MakeZero();
 
@@ -123,10 +127,7 @@ Spider::Spider(Curve* curveToFollow)
 	angle[frontLeft] = -legAngle;
 	phase[frontLeft] = 1.5f * M_PI;
 
-	Vec3 nextPos = _curve->Position(0.01f);
-	_position = _curve->Position(0);
-	_yaw = atan2f(nextPos[0] - _position[0], nextPos[2] - _position[2]);
-	_yaw *= (180.0f / M_PI);
+	_yaw = 0.0f;
 	targetYaw = _yaw;
 
 #pragma endregion
@@ -176,6 +177,14 @@ Spider::Spider(Curve* curveToFollow)
 
 #pragma endregion
 
+}
+
+BoundingSphere Spider::GetCollisionSphere()
+{
+	BoundingSphere sphere;
+	sphere.Position = _position;
+	sphere.Radius = 2.0f;
+	return sphere;
 }
 
 Spider::~Spider(void)
@@ -348,7 +357,7 @@ void Spider::Draw()
 	glPushMatrix(); //head
 	glTranslatef(0.0f, 0.1f, 1.3f);
 	glScalef(0.8f, 0.8f, 0.8f);	
-	glCallList(skullList);
+	//glCallList(skullList);
 	glPopMatrix(); // head
 
 	renderLegs();
@@ -375,6 +384,13 @@ void Spider::DrawDebug()
 	drawConstraints();
 	drawConstraints(col, endTransform);
 	drawFeet();
+	glPushMatrix();
+	Material::DebugMaterial()->SetMaterial();
+	glColor3f(1.0f, 0.0f, 0.0f);
+	BoundingSphere sphere = GetCollisionSphere();
+	glTranslatef(sphere.Position[0], sphere.Position[1], sphere.Position[2]);
+	gluSphere(nQ, sphere.Radius, 20, 20);
+	glPopMatrix();
 }
 
 void Spider::drawFeet()
@@ -657,3 +673,22 @@ void Spider::setFootCurve(int i)
 	}	
 }
 
+void Spider::Fire(float yaw, float pitch)
+{
+	Vec3 wsPos, wsVel;	
+	Mat4 transform = HRot4(Vec3(1.0, 0.0, 0.0), -pitch / (180.0f / M_PI));
+	transform *= HRot4(Vec3(0.0, 1.0, 0.0), -yaw / (180.0f / M_PI));
+	WebShot* webShot;
+
+	wsVel = proj(Vec4(0.0, 0.0, 1.0, 1.0) * transform);
+	wsPos = _position + wsVel * 2.5f;
+	wsVel *= 10.0f;
+
+	webShot = new WebShot(wsPos, wsVel);
+	EntityManager::CurrentInstance()->AddEntity(webShot);
+}
+
+void Spider::Attack()
+{
+
+}

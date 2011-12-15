@@ -9,7 +9,7 @@
 class Spider: public Entity
 {
 public:
-	Spider(Curve* curveToFollow);
+	Spider(Vec3 position);
 	~Spider(void);
 	void Draw();
 	void DrawDebug();
@@ -21,6 +21,8 @@ public:
 	void TurnLeft();
 	void TurnRight();	
 	void SetTargetYaw(float yaw);
+	void Fire(float yaw, float pitch);
+	void Attack();
 	static const int frontLeft = 0;
 	static const int frontRight = 1;
 	static const int secondLeft = 2;
@@ -35,6 +37,7 @@ public:
 	Vec3 getPos();
 	float getYaw();
 	Mat4 getTransform();
+	BoundingSphere GetCollisionSphere();
 
 private:
 	void drawConstraints(float * color, Mat4 transform);
